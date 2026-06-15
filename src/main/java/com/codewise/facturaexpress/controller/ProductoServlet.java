@@ -1,5 +1,6 @@
 package com.codewise.facturaexpress.controller;
 
+import com.codewise.facturaexpress.config.AuthUtil;
 import com.codewise.facturaexpress.model.Producto;
 import com.codewise.facturaexpress.service.ProductoService;
 import jakarta.servlet.ServletException;
@@ -12,11 +13,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Servlet para el CRUD de productos.
- * Responde a GET /productos (listar, nuevo, editar, eliminar) y
- * POST /productos (guardar, actualizar).
- */
 public class ProductoServlet extends HttpServlet {
 
     private ProductoService productoService;
@@ -26,19 +22,16 @@ public class ProductoServlet extends HttpServlet {
         productoService = new ProductoService();
     }
 
-    /**
-     * Maneja las acciones de lectura sobre productos:
-     * listar (default), mostrar formulario nuevo, mostrar formulario edición, o eliminar.
-     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (req.getSession().getAttribute("usuario") == null) {
+        if (AuthUtil.getUsuario(req) == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
         req.setAttribute("activeNav", "productos");
         req.setAttribute("pageTitle", "Productos");
+        req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         String action = req.getParameter("action");
         if (action == null) action = "listar";
 
@@ -57,14 +50,16 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Maneja las acciones de escritura sobre productos: guardar (crear) o actualizar.
-     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (req.getSession().getAttribute("usuario") == null) {
+        if (AuthUtil.getUsuario(req) == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+        if (!AuthUtil.validarCsrfToken(req)) {
+            req.setAttribute("error", "Token CSRF invalido");
+            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
             return;
         }
         req.setAttribute("activeNav", "productos");
@@ -77,9 +72,6 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Obtiene todos los productos y los envía a la vista de listado.
-     */
     private void listarProductos(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -92,9 +84,6 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Busca un producto por ID y carga sus datos en el formulario de edición.
-     */
     private void mostrarFormularioEdicion(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -113,24 +102,31 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Crea un nuevo producto con los datos del formulario y lo persiste.
-     */
     private void guardarProducto(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
             Producto producto = new Producto();
             producto.setNombre(req.getParameter("nombre"));
             producto.setDescripcion(req.getParameter("descripcion"));
-            producto.setPrecio(new BigDecimal(req.getParameter("precio")));
-            producto.setStock(Integer.parseInt(req.getParameter("stock")));
+            String precioStr = req.getParameter("precio");
+            if (precioStr == null || precioStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("El precio es obligatorio");
+            }
+            producto.setPrecio(new BigDecimal(precioStr));
+            String stockStr = req.getParameter("stock");
+            if (stockStr == null || stockStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("El stock es obligatorio");
+            }
+            producto.setStock(Integer.parseInt(stockStr));
 
             productoService.guardarProducto(producto);
             req.setAttribute("mensaje", "Producto registrado exitosamente");
             req.setAttribute("redirectUrl", req.getContextPath() + "/productos");
             req.getRequestDispatcher("/WEB-INF/jsp/confirmacion.jsp").forward(req, resp);
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "Precio o stock invalido: deben ser numeros");
+            req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
-            // Error de validación: regresa al formulario con el mensaje
             req.setAttribute("error", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (Exception e) {
@@ -139,9 +135,6 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Actualiza un producto existente identificado por su ID.
-     */
     private void actualizarProducto(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -149,13 +142,23 @@ public class ProductoServlet extends HttpServlet {
             producto.setId(Long.parseLong(req.getParameter("id")));
             producto.setNombre(req.getParameter("nombre"));
             producto.setDescripcion(req.getParameter("descripcion"));
-            producto.setPrecio(new BigDecimal(req.getParameter("precio")));
-            producto.setStock(Integer.parseInt(req.getParameter("stock")));
+            String precioStr = req.getParameter("precio");
+            if (precioStr == null || precioStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("El precio es obligatorio");
+            }
+            producto.setPrecio(new BigDecimal(precioStr));
+            String stockStr = req.getParameter("stock");
+            if (stockStr == null || stockStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("El stock es obligatorio");
+            }
+            producto.setStock(Integer.parseInt(stockStr));
 
             productoService.actualizarProducto(producto);
             resp.sendRedirect(req.getContextPath() + "/productos");
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "Precio o stock invalido: deben ser numeros");
+            req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
-            // Error de validación: regresa al formulario con el mensaje
             req.setAttribute("error", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (Exception e) {
@@ -164,15 +167,15 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Elimina un producto por ID y redirige al listado.
-     */
     private void eliminarProducto(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
         try {
             Long id = Long.parseLong(req.getParameter("id"));
             productoService.eliminarProducto(id);
             resp.sendRedirect(req.getContextPath() + "/productos");
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "ID de producto invalido");
+            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al eliminar producto: " + e.getMessage());
             req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);

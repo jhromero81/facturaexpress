@@ -151,10 +151,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
         detalle.setCantidad(rs.getInt("cantidad"));
         detalle.setPrecioUnitario(rs.getBigDecimal("precio_unitario"));
         detalle.setSubtotal(rs.getBigDecimal("subtotal"));
-        try {
-            detalle.setProductoNombre(rs.getString("producto_nombre"));
-        } catch (SQLException ignored) {
-        }
+        detalle.setProductoNombre(rs.getString("producto_nombre"));
         return detalle;
     }
 }

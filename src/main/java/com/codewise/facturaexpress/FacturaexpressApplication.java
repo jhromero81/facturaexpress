@@ -3,6 +3,8 @@ package com.codewise.facturaexpress;
 import com.codewise.facturaexpress.controller.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.tomcat.TomcatWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
@@ -97,5 +99,16 @@ public class FacturaexpressApplication {
 		ServletRegistrationBean<ReportesServlet> bean = new ServletRegistrationBean<>(new ReportesServlet(), "/reportes");
 		bean.setLoadOnStartup(1);
 		return bean;
+	}
+
+	/**
+	 * Configura el contenedor Tomcat embebido para que sirva index.jsp
+	 * como welcome file en la ra&iacute;z (http://localhost:8080/).
+	 */
+	@Bean
+	public WebServerFactoryCustomizer<TomcatWebServerFactory> welcomePageCustomizer() {
+		return factory -> factory.addContextCustomizers(
+				context -> context.addWelcomeFile("index.jsp")
+		);
 	}
 }

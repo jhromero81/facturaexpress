@@ -69,13 +69,13 @@ CREATE TABLE IF NOT EXISTS detalles_factura (
 
 -- ============================================================
 -- Tabla: usuarios
--- Usuarios del sistema con autenticación por hash SHA-256
+-- Usuarios del sistema con autenticación por BCrypt
 -- Los roles controlan los permisos: ADMIN, VENDEDOR, CONTADOR
 -- ============================================================
 CREATE TABLE IF NOT EXISTS usuarios (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,   -- Identificador único del usuario
     username VARCHAR(50) NOT NULL UNIQUE,    -- Nombre de usuario (login)
-    password_hash VARCHAR(64) NOT NULL,      -- Hash SHA-256 de la contraseña
+    password_hash VARCHAR(255) NOT NULL,      -- Hash BCrypt de la contraseña
     nombre VARCHAR(150) NOT NULL,            -- Nombre completo del usuario
     email VARCHAR(200),                      -- Correo electrónico
     rol VARCHAR(20) NOT NULL DEFAULT 'VENDEDOR',  -- Rol: ADMIN, VENDEDOR, CONTADOR
@@ -86,9 +86,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
 -- ============================================================
 -- Seed data: usuarios por defecto
 -- Todos comparten la misma contraseña: 'admin123'
--- Hash SHA-256: 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
+-- Hash BCrypt: $2a$10$EWNk7IvbIFRJJUi5exXkYOX8srQIlqaDz.wtHMo8HncR4.BADvvRu
+-- Generar nuevo hash con: LoginService.hashPassword("admin123")
 -- ============================================================
 INSERT INTO usuarios (username, password_hash, nombre, email, rol) VALUES
-('admin',    '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Administrador', 'admin@facturaexpress.com', 'ADMIN'),
-('vendedor', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Vendedor Demo', 'vendedor@facturaexpress.com', 'VENDEDOR'),
-('contador', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Contador Demo', 'contador@facturaexpress.com', 'CONTADOR');
+('admin',    '$2a$10$EWNk7IvbIFRJJUi5exXkYOX8srQIlqaDz.wtHMo8HncR4.BADvvRu', 'Administrador', 'admin@facturaexpress.com', 'ADMIN'),
+('vendedor', '$2a$10$EWNk7IvbIFRJJUi5exXkYOX8srQIlqaDz.wtHMo8HncR4.BADvvRu', 'Vendedor Demo', 'vendedor@facturaexpress.com', 'VENDEDOR'),
+('contador', '$2a$10$EWNk7IvbIFRJJUi5exXkYOX8srQIlqaDz.wtHMo8HncR4.BADvvRu', 'Contador Demo', 'contador@facturaexpress.com', 'CONTADOR');

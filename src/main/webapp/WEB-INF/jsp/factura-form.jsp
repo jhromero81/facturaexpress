@@ -21,6 +21,7 @@
 
   <%-- Formulario: envía vía POST a /facturas con acción "guardar" --%>
   <form action="<%= ctx %>/facturas" method="post">
+    <input type="hidden" name="_csrf_token" value="<%= request.getAttribute("csrfToken") %>">
     <input type="hidden" name="action" value="guardar">
 
     <%-- Selector de cliente --%>

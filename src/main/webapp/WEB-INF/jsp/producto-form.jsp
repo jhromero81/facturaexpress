@@ -21,6 +21,7 @@
 
   <%-- Formulario: envía vía POST a /productos con acción "guardar" o "actualizar" --%>
   <form action="<%= ctx %>/productos" method="post">
+    <input type="hidden" name="_csrf_token" value="<%= request.getAttribute("csrfToken") %>">
     <input type="hidden" name="action" value="<%= editando ? "actualizar" : "guardar" %>">
     <% if (editando) { %>
       <%-- Campo oculto con el ID del producto a editar --%>

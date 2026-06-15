@@ -108,6 +108,23 @@ public class ProductoDAOImpl implements ProductoDAO {
         }
     }
 
+    @Override
+    public void descontarStock(Long productoId, int cantidad) {
+        String sql = "UPDATE productos SET stock = stock - ? WHERE id = ? AND stock >= ?";
+        try (Connection conn = databaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, cantidad);
+            stmt.setLong(2, productoId);
+            stmt.setInt(3, cantidad);
+            int affected = stmt.executeUpdate();
+            if (affected == 0) {
+                throw new IllegalStateException("Stock insuficiente para el producto ID: " + productoId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al descontar stock del producto", e);
+        }
+    }
+
     private Producto mapearProducto(ResultSet rs) throws SQLException {
         Producto producto = new Producto();
         producto.setId(rs.getLong("id"));

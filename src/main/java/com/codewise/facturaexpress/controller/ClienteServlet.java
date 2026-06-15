@@ -1,5 +1,6 @@
 package com.codewise.facturaexpress.controller;
 
+import com.codewise.facturaexpress.config.AuthUtil;
 import com.codewise.facturaexpress.model.Cliente;
 import com.codewise.facturaexpress.service.ClienteService;
 import jakarta.servlet.ServletException;
@@ -11,11 +12,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Servlet para el CRUD de clientes.
- * Responde a GET /clientes (listar, nuevo, editar, eliminar) y
- * POST /clientes (guardar, actualizar).
- */
 public class ClienteServlet extends HttpServlet {
 
     private ClienteService clienteService;
@@ -25,19 +21,16 @@ public class ClienteServlet extends HttpServlet {
         clienteService = new ClienteService();
     }
 
-    /**
-     * Maneja las acciones de lectura sobre clientes:
-     * listar (default), mostrar formulario nuevo, mostrar formulario edición, o eliminar.
-     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (req.getSession().getAttribute("usuario") == null) {
+        if (AuthUtil.getUsuario(req) == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
         req.setAttribute("activeNav", "clientes");
         req.setAttribute("pageTitle", "Clientes");
+        req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         String action = req.getParameter("action");
         if (action == null) action = "listar";
 
@@ -56,14 +49,16 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Maneja las acciones de escritura sobre clientes: guardar (crear) o actualizar.
-     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (req.getSession().getAttribute("usuario") == null) {
+        if (AuthUtil.getUsuario(req) == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+        if (!AuthUtil.validarCsrfToken(req)) {
+            req.setAttribute("error", "Token CSRF invalido");
+            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
             return;
         }
         req.setAttribute("activeNav", "clientes");
@@ -76,9 +71,6 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Obtiene todos los clientes y los envía a la vista de listado.
-     */
     private void listarClientes(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -91,9 +83,6 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Busca un cliente por ID y carga sus datos en el formulario de edición.
-     */
     private void mostrarFormularioEdicion(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -112,9 +101,6 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Crea un nuevo cliente con los datos del formulario y lo persiste.
-     */
     private void guardarCliente(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -129,7 +115,6 @@ public class ClienteServlet extends HttpServlet {
             req.setAttribute("redirectUrl", req.getContextPath() + "/clientes");
             req.getRequestDispatcher("/WEB-INF/jsp/confirmacion.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
-            // Error de validación: regresa al formulario con el mensaje
             req.setAttribute("error", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/jsp/cliente-form.jsp").forward(req, resp);
         } catch (Exception e) {
@@ -138,9 +123,6 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Actualiza un cliente existente identificado por su ID.
-     */
     private void actualizarCliente(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -155,7 +137,6 @@ public class ClienteServlet extends HttpServlet {
             clienteService.actualizarCliente(cliente);
             resp.sendRedirect(req.getContextPath() + "/clientes");
         } catch (IllegalArgumentException e) {
-            // Error de validación: reconstruye el objeto y regresa al formulario
             req.setAttribute("error", e.getMessage());
             req.setAttribute("cliente", construirClienteDesdeRequest(req));
             req.getRequestDispatcher("/WEB-INF/jsp/cliente-form.jsp").forward(req, resp);
@@ -165,25 +146,21 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Elimina un cliente por ID y redirige al listado.
-     */
     private void eliminarCliente(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
         try {
             Long id = Long.parseLong(req.getParameter("id"));
             clienteService.eliminarCliente(id);
             resp.sendRedirect(req.getContextPath() + "/clientes");
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "ID de cliente invalido");
+            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al eliminar cliente: " + e.getMessage());
             req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
         }
     }
 
-    /**
-     * Reconstruye un objeto Cliente con los parámetros HTTP recibidos,
-     * útil para re-poblar el formulario cuando ocurre un error de validación.
-     */
     private Cliente construirClienteDesdeRequest(HttpServletRequest req) {
         Cliente c = new Cliente();
         if (req.getParameter("id") != null) {

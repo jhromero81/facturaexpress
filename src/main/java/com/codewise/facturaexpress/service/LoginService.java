@@ -3,28 +3,20 @@ package com.codewise.facturaexpress.service;
 import com.codewise.facturaexpress.dao.UsuarioDAO;
 import com.codewise.facturaexpress.dao.UsuarioDAOImpl;
 import com.codewise.facturaexpress.model.Usuario;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
-/**
- * Servicio de autenticación de usuarios. Compara la contraseña ingresada
- * contra el hash SHA-256 almacenado (sin salt ni iteraciones).
- */
 public class LoginService {
 
     private final UsuarioDAO usuarioDAO;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public LoginService() {
         this.usuarioDAO = new UsuarioDAOImpl();
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    /**
-     * Autentica un usuario verificando username y contraseña.
-     * Retorna Optional vacío si las credenciales son inválidas o no coinciden.
-     */
     public Optional<Usuario> autenticar(String username, String password) {
         if (username == null || username.trim().isEmpty() || password == null || password.isEmpty()) {
             return Optional.empty();
@@ -32,36 +24,17 @@ public class LoginService {
         Optional<Usuario> usuarioOpt = usuarioDAO.buscarPorUsername(username.trim());
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            // Compara el hash SHA-256 de la contraseña ingresada contra el almacenado
-            if (usuario.getPasswordHash().equals(hashPassword(password))) {
+            if (passwordEncoder.matches(password, usuario.getPasswordHash())) {
                 return Optional.of(usuario);
             }
         }
         return Optional.empty();
     }
 
-    /**
-     * Genera el hash SHA-256 de la contraseña en formato hexadecimal.
-     * ADVERTENCIA: no se aplica salt, lo que hace el hash vulnerable
-     * a ataques de tabla arcoíris. No apto para producción real.
-     */
-    public static String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hex = new StringBuilder();
-            for (byte b : hash) {
-                hex.append(String.format("%02x", b));
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error al hashear contraseña", e);
-        }
+    public static String hashPassword(String rawPassword) {
+        return new BCryptPasswordEncoder().encode(rawPassword);
     }
 
-    /**
-     * Método de prueba para generar hashes durante desarrollo.
-     */
     public static void main(String[] args) {
         System.out.println(hashPassword("admin123"));
     }

@@ -21,4 +21,7 @@ public interface ProductoDAO {
 
     /** Elimina un producto por su ID. */
     void eliminar(Long id);
+
+    /** Reduce el stock de un producto en la cantidad indicada. */
+    void descontarStock(Long productoId, int cantidad);
 }

@@ -1,5 +1,6 @@
 package com.codewise.facturaexpress.controller;
 
+import com.codewise.facturaexpress.config.AuthUtil;
 import com.codewise.facturaexpress.model.Usuario;
 import com.codewise.facturaexpress.service.LoginService;
 import jakarta.servlet.ServletException;
@@ -56,6 +57,7 @@ public class LoginServlet extends HttpServlet {
         if (usuarioOpt.isPresent()) {
             HttpSession session = req.getSession();
             session.setAttribute("usuario", usuarioOpt.get());
+            AuthUtil.generarCsrfToken(session);
             resp.sendRedirect(req.getContextPath() + "/dashboard");
         } else {
             // Credenciales inválidas: devuelve error al formulario

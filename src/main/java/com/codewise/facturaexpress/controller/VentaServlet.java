@@ -1,5 +1,6 @@
 package com.codewise.facturaexpress.controller;
 
+import com.codewise.facturaexpress.config.AuthUtil;
 import com.codewise.facturaexpress.model.*;
 import com.codewise.facturaexpress.service.*;
 import jakarta.servlet.ServletException;
@@ -12,12 +13,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Servlet para el Punto de Venta (POS).
- * Responde a GET /ventas (carga la interfaz POS con clientes y productos) y
- * POST /ventas (búsqueda de clientes o finalización de una venta).
- * La venta se modela como una Factura con sus detalles.
- */
 public class VentaServlet extends HttpServlet {
 
     private FacturaService facturaService;
@@ -31,13 +26,10 @@ public class VentaServlet extends HttpServlet {
         productoService = new ProductoService();
     }
 
-    /**
-     * Carga la interfaz del punto de venta con la lista de clientes y productos disponibles.
-     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (req.getSession().getAttribute("usuario") == null) {
+        if (AuthUtil.getUsuario(req) == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
@@ -46,6 +38,7 @@ public class VentaServlet extends HttpServlet {
             req.setAttribute("productos", productoService.listarProductos());
             req.setAttribute("activeNav", "ventas");
             req.setAttribute("pageTitle", "Punto de Venta");
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/pos.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al cargar POS: " + e.getMessage());
@@ -53,20 +46,20 @@ public class VentaServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Procesa acciones del POS: búsqueda de clientes por nombre/ID o finalización de una venta.
-     * La finalización crea una factura con los productos seleccionados y redirige a confirmación.
-     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (req.getSession().getAttribute("usuario") == null) {
+        if (AuthUtil.getUsuario(req) == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+        if (!AuthUtil.validarCsrfToken(req)) {
+            req.setAttribute("error", "Token CSRF invalido");
+            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
             return;
         }
         try {
             String action = req.getParameter("action");
-            // Búsqueda de clientes en el POS por nombre o ID
             if ("buscarCliente".equals(action)) {
                 String termino = req.getParameter("termino");
                 List<Cliente> resultados = clienteService.listarClientes();
@@ -79,16 +72,15 @@ public class VentaServlet extends HttpServlet {
                         }
                     }
                 }
-                // Si no hay coincidencias, muestra la lista completa
                 req.setAttribute("clientes", filtrados.isEmpty() ? resultados : filtrados);
                 req.setAttribute("productos", productoService.listarProductos());
                 req.setAttribute("activeNav", "ventas");
                 req.setAttribute("pageTitle", "Punto de Venta");
+                req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
                 req.getRequestDispatcher("/WEB-INF/jsp/pos.jsp").forward(req, resp);
                 return;
             }
 
-            // Finalización de la venta: crea la factura con los detalles
             if ("finalizar".equals(action)) {
                 String clienteIdParam = req.getParameter("clienteId");
                 String[] productosId = req.getParameterValues("productoId");
@@ -102,12 +94,10 @@ public class VentaServlet extends HttpServlet {
                     throw new IllegalArgumentException("Debe seleccionar un cliente");
                 }
 
-                // Valida que haya al menos un producto en la venta
                 if (productosId == null || productosId.length == 0) {
                     throw new IllegalArgumentException("Debe agregar al menos un producto");
                 }
 
-                // Construye los detalles de la factura a partir de los arrays del formulario
                 List<DetalleFactura> detalles = new ArrayList<>();
                 for (int i = 0; i < productosId.length; i++) {
                     if (productosId[i] == null || productosId[i].isEmpty()) continue;
@@ -126,10 +116,14 @@ public class VentaServlet extends HttpServlet {
                 return;
             }
 
-            // Acción desconocida: redirige al POS
             resp.sendRedirect(req.getContextPath() + "/ventas");
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "Error en el formato de los numeros ingresados");
+            cargarDatos(req);
+            req.setAttribute("activeNav", "ventas");
+            req.setAttribute("pageTitle", "Punto de Venta");
+            req.getRequestDispatcher("/WEB-INF/jsp/pos.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
-            // Error de validación: recarga el POS con el mensaje de error
             req.setAttribute("error", e.getMessage());
             cargarDatos(req);
             req.setAttribute("activeNav", "ventas");
@@ -141,16 +135,11 @@ public class VentaServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Recarga los datos de clientes y productos en la request para re-poblar el POS
-     * después de un error de validación.
-     */
     private void cargarDatos(HttpServletRequest req) {
         try {
             req.setAttribute("clientes", clienteService.listarClientes());
             req.setAttribute("productos", productoService.listarProductos());
         } catch (Exception e) {
-            // Si falla la recarga se omite silenciosamente
         }
     }
 }

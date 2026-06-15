@@ -15,6 +15,7 @@
 
 <%-- Formulario de venta: envía el carrito a /ventas con acción "finalizar" --%>
 <form id="ventaForm" action="<%= ctx %>/ventas" method="post">
+  <input type="hidden" name="_csrf_token" value="<%= request.getAttribute("csrfToken") %>">
   <input type="hidden" name="action" value="finalizar">
 
   <div class="row" style="margin-bottom:0;">
