@@ -5,14 +5,18 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entidad que mapea la tabla "facturas" de la base de datos.
+ * Representa una factura o comprobante de venta.
+ */
 public class Factura {
 
     private Long id;
     private Long clienteId;
     private String clienteNombre;
     private LocalDateTime fecha;
-    private BigDecimal total;
-    private String estado;
+    private BigDecimal total;   // monto total de la factura
+    private String estado;      // estado: PENDIENTE, PAGADA, ANULADA, etc.
     private List<DetalleFactura> detalles;
 
     public Factura() {

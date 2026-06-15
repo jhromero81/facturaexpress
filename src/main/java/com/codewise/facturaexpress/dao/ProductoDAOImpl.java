@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementaci&oacute;n de ProductoDAO con JDBC.
+ * Ejecuta consultas SQL directamente contra la tabla "productos".
+ */
 public class ProductoDAOImpl implements ProductoDAO {
 
     private final DatabaseConfig databaseConfig;
@@ -18,6 +22,7 @@ public class ProductoDAOImpl implements ProductoDAO {
 
     @Override
     public Producto guardar(Producto producto) {
+        // Inserta un nuevo producto y recupera el ID autogenerado
         String sql = "INSERT INTO productos (nombre, descripcion, precio, stock) VALUES (?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -39,6 +44,7 @@ public class ProductoDAOImpl implements ProductoDAO {
 
     @Override
     public Optional<Producto> buscarPorId(Long id) {
+        // Busca un producto por su ID primario
         String sql = "SELECT * FROM productos WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -56,6 +62,7 @@ public class ProductoDAOImpl implements ProductoDAO {
 
     @Override
     public List<Producto> listarTodos() {
+        // Obtiene todos los productos ordenados por ID
         String sql = "SELECT * FROM productos ORDER BY id";
         List<Producto> productos = new ArrayList<>();
         try (Connection conn = databaseConfig.getConnection();
@@ -72,6 +79,7 @@ public class ProductoDAOImpl implements ProductoDAO {
 
     @Override
     public Producto actualizar(Producto producto) {
+        // Actualiza los datos de un producto existente por ID
         String sql = "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ? WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -89,6 +97,7 @@ public class ProductoDAOImpl implements ProductoDAO {
 
     @Override
     public void eliminar(Long id) {
+        // Elimina un producto por su ID
         String sql = "DELETE FROM productos WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

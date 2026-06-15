@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementaci&oacute;n de FacturaDAO con JDBC.
+ * Ejecuta consultas SQL directamente contra la tabla "facturas",
+ * incluyendo operaciones transaccionales con sus detalles.
+ */
 public class FacturaDAOImpl implements FacturaDAO {
 
     private final DatabaseConfig databaseConfig;
@@ -21,6 +26,7 @@ public class FacturaDAOImpl implements FacturaDAO {
 
     @Override
     public Factura guardar(Factura factura) {
+        // Inserta la factura y sus detalles en una misma transacci&oacute;n
         String sql = "INSERT INTO facturas (cliente_id, fecha, total, estado) VALUES (?, ?, ?, ?)";
         Connection conn = null;
         try {
@@ -51,6 +57,7 @@ public class FacturaDAOImpl implements FacturaDAO {
             conn.commit();
             return factura;
         } catch (SQLException e) {
+            // Si algo falla, revierte la transacci&oacute;n
             if (conn != null) {
                 try {
                     conn.rollback();
@@ -73,6 +80,7 @@ public class FacturaDAOImpl implements FacturaDAO {
 
     @Override
     public Optional<Factura> buscarPorId(Long id) {
+        // Busca factura por ID incluyendo el nombre del cliente (LEFT JOIN)
         String sql = "SELECT f.*, c.nombre AS cliente_nombre FROM facturas f " +
                      "LEFT JOIN clientes c ON f.cliente_id = c.id WHERE f.id = ?";
         try (Connection conn = databaseConfig.getConnection();
@@ -93,6 +101,7 @@ public class FacturaDAOImpl implements FacturaDAO {
 
     @Override
     public List<Factura> listarTodos() {
+        // Lista todas las facturas con el nombre del cliente (LEFT JOIN)
         String sql = "SELECT f.*, c.nombre AS cliente_nombre FROM facturas f " +
                      "LEFT JOIN clientes c ON f.cliente_id = c.id ORDER BY f.id";
         List<Factura> facturas = new ArrayList<>();
@@ -110,6 +119,7 @@ public class FacturaDAOImpl implements FacturaDAO {
 
     @Override
     public Factura actualizar(Factura factura) {
+        // Actualiza los campos de una factura existente por ID
         String sql = "UPDATE facturas SET cliente_id = ?, fecha = ?, total = ?, estado = ? WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -127,6 +137,7 @@ public class FacturaDAOImpl implements FacturaDAO {
 
     @Override
     public void eliminar(Long id) {
+        // Elimina factura y sus detalles en una transacci&oacute;n
         Connection conn = null;
         try {
             conn = databaseConfig.getConnection();
@@ -141,6 +152,7 @@ public class FacturaDAOImpl implements FacturaDAO {
 
             conn.commit();
         } catch (SQLException e) {
+            // Si algo falla, revierte la transacci&oacute;n
             if (conn != null) {
                 try {
                     conn.rollback();

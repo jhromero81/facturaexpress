@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementaci&oacute;n de ClienteDAO con JDBC.
+ * Ejecuta consultas SQL directamente contra la tabla "clientes".
+ */
 public class ClienteDAOImpl implements ClienteDAO {
 
     private final DatabaseConfig databaseConfig;
@@ -19,6 +23,7 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
     public Cliente guardar(Cliente cliente) {
+        // Inserta un nuevo cliente y recupera el ID autogenerado
         String sql = "INSERT INTO clientes (nombre, email, telefono, direccion, fecha_creacion) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -42,6 +47,7 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
     public Optional<Cliente> buscarPorId(Long id) {
+        // Busca un cliente por su ID primario
         String sql = "SELECT * FROM clientes WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -59,6 +65,7 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
     public List<Cliente> listarTodos() {
+        // Obtiene todos los clientes ordenados por ID
         String sql = "SELECT * FROM clientes ORDER BY id";
         List<Cliente> clientes = new ArrayList<>();
         try (Connection conn = databaseConfig.getConnection();
@@ -75,6 +82,7 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
     public Cliente actualizar(Cliente cliente) {
+        // Actualiza los datos de un cliente existente por ID
         String sql = "UPDATE clientes SET nombre = ?, email = ?, telefono = ?, direccion = ? WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -92,6 +100,7 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
     public void eliminar(Long id) {
+        // Elimina un cliente por su ID
         String sql = "DELETE FROM clientes WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

@@ -2,13 +2,17 @@ package com.codewise.facturaexpress.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Entidad que mapea la tabla "productos" de la base de datos.
+ * Almacena el catálogo de productos disponibles para la venta.
+ */
 public class Producto {
 
     private Long id;
     private String nombre;
     private String descripcion;
-    private BigDecimal precio;
-    private Integer stock;
+    private BigDecimal precio;  // precio unitario del producto
+    private Integer stock;      // cantidad disponible en inventario
 
     public Producto() {
     }

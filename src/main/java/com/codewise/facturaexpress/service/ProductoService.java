@@ -8,6 +8,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Servicio CRUD para productos con validaciones de negocio:
+ * nombre obligatorio, precio mayor a cero y stock no negativo.
+ */
 public class ProductoService {
 
     private final ProductoDAO productoDAO;
@@ -16,6 +20,9 @@ public class ProductoService {
         this.productoDAO = new ProductoDAOImpl();
     }
 
+    /**
+     * Guarda un nuevo producto tras validar nombre, precio (> 0) y stock (>= 0).
+     */
     public Producto guardarProducto(Producto producto) {
         if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del producto es obligatorio");
@@ -29,6 +36,9 @@ public class ProductoService {
         return productoDAO.guardar(producto);
     }
 
+    /**
+     * Busca un producto por su ID.
+     */
     public Optional<Producto> buscarPorId(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de producto invalido");
@@ -36,10 +46,16 @@ public class ProductoService {
         return productoDAO.buscarPorId(id);
     }
 
+    /**
+     * Retorna la lista completa de productos.
+     */
     public List<Producto> listarProductos() {
         return productoDAO.listarTodos();
     }
 
+    /**
+     * Actualiza un producto existente. El ID es obligatorio.
+     */
     public Producto actualizarProducto(Producto producto) {
         if (producto.getId() == null) {
             throw new IllegalArgumentException("El ID del producto es obligatorio para actualizar");
@@ -47,6 +63,9 @@ public class ProductoService {
         return productoDAO.actualizar(producto);
     }
 
+    /**
+     * Elimina un producto por su ID.
+     */
     public void eliminarProducto(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de producto invalido");

@@ -2,13 +2,17 @@ package com.codewise.facturaexpress.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Entidad que mapea la tabla "clientes" de la base de datos.
+ * Almacena la información de los clientes registrados en el sistema.
+ */
 public class Cliente {
 
     private Long id;
     private String nombre;
     private String email;
-    private String telefono;
-    private String direccion;
+    private String telefono;    // número de contacto del cliente
+    private String direccion;   // dirección física del cliente
     private LocalDateTime fechaCreacion;
 
     public Cliente() {

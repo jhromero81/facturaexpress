@@ -2,6 +2,10 @@ package com.codewise.facturaexpress.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Entidad que mapea la tabla "detalles_factura" de la base de datos.
+ * Almacena cada línea de producto asociada a una factura.
+ */
 public class DetalleFactura {
 
     private Long id;
@@ -9,8 +13,8 @@ public class DetalleFactura {
     private Long productoId;
     private String productoNombre;
     private Integer cantidad;
-    private BigDecimal precioUnitario;
-    private BigDecimal subtotal;
+    private BigDecimal precioUnitario; // precio del producto al momento de la venta
+    private BigDecimal subtotal;       // cantidad * precioUnitario
 
     public DetalleFactura() {
     }

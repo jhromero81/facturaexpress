@@ -8,6 +8,11 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Configuración JDBC con patrón singleton. No utiliza pool de conexiones;
+ * cada llamada a getConnection() crea una nueva conexión física.
+ * Lee las credenciales de application.properties en el classpath.
+ */
 public class DatabaseConfig {
 
     private static final Logger LOGGER = Logger.getLogger(DatabaseConfig.class.getName());
@@ -16,7 +21,12 @@ public class DatabaseConfig {
     private final String username;
     private final String password;
 
+    /**
+     * Constructor privado que carga las propiedades de conexión
+     * desde el archivo application.properties en el classpath.
+     */
     private DatabaseConfig() {
+        // Carga el archivo de propiedades desde el classpath
         Properties props = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             if (input == null) {
@@ -32,6 +42,10 @@ public class DatabaseConfig {
         }
     }
 
+    /**
+     * Retorna la única instancia de DatabaseConfig (singleton sincronizado).
+     * La instancia se crea bajo demanda en la primera invocación.
+     */
     public static synchronized DatabaseConfig getInstance() {
         if (instance == null) {
             instance = new DatabaseConfig();
@@ -39,6 +53,10 @@ public class DatabaseConfig {
         return instance;
     }
 
+    /**
+     * Abre y retorna una nueva conexión JDBC directamente desde DriverManager.
+     * ATENCIÓN: no hay pool; cada llamada crea una conexión física nueva.
+     */
     public Connection getConnection() throws SQLException {
         Connection connection = DriverManager.getConnection(url, username, password);
         LOGGER.log(Level.FINE, "Conexion JDBC establecida");

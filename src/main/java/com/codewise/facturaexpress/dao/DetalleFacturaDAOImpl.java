@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementaci&oacute;n de DetalleFacturaDAO con JDBC.
+ * Ejecuta consultas SQL directamente contra la tabla "detalles_factura".
+ */
 public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
 
     private final DatabaseConfig databaseConfig;
@@ -18,6 +22,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
 
     @Override
     public DetalleFactura guardar(DetalleFactura detalle) {
+        // Inserta un nuevo detalle de factura y recupera el ID autogenerado
         String sql = "INSERT INTO detalles_factura (factura_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -40,6 +45,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
 
     @Override
     public Optional<DetalleFactura> buscarPorId(Long id) {
+        // Busca un detalle por ID incluyendo el nombre del producto (LEFT JOIN)
         String sql = "SELECT df.*, p.nombre AS producto_nombre FROM detalles_factura df " +
                      "LEFT JOIN productos p ON df.producto_id = p.id WHERE df.id = ?";
         try (Connection conn = databaseConfig.getConnection();
@@ -58,6 +64,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
 
     @Override
     public List<DetalleFactura> listarPorFacturaId(Long facturaId) {
+        // Lista todos los detalles de una factura, ordenados por ID, con nombre del producto
         String sql = "SELECT df.*, p.nombre AS producto_nombre FROM detalles_factura df " +
                      "LEFT JOIN productos p ON df.producto_id = p.id WHERE df.factura_id = ? ORDER BY df.id";
         List<DetalleFactura> detalles = new ArrayList<>();
@@ -77,6 +84,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
 
     @Override
     public List<DetalleFactura> listarTodos() {
+        // Lista todos los detalles con nombre del producto, ordenados por ID
         String sql = "SELECT df.*, p.nombre AS producto_nombre FROM detalles_factura df " +
                      "LEFT JOIN productos p ON df.producto_id = p.id ORDER BY df.id";
         List<DetalleFactura> detalles = new ArrayList<>();
@@ -94,6 +102,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
 
     @Override
     public DetalleFactura actualizar(DetalleFactura detalle) {
+        // Actualiza cantidad, precio unitario y subtotal de un detalle
         String sql = "UPDATE detalles_factura SET cantidad = ?, precio_unitario = ?, subtotal = ? WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -110,6 +119,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
 
     @Override
     public void eliminar(Long id) {
+        // Elimina un detalle por su ID
         String sql = "DELETE FROM detalles_factura WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -122,6 +132,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
 
     @Override
     public void eliminarPorFacturaId(Long facturaId) {
+        // Elimina todos los detalles asociados a una factura
         String sql = "DELETE FROM detalles_factura WHERE factura_id = ?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
