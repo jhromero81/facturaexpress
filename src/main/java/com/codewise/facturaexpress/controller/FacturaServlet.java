@@ -210,6 +210,7 @@ public class FacturaServlet extends HttpServlet {
             req.setAttribute("clientes", clienteService.listarClientes());
             req.setAttribute("productos", productoService.listarProductos());
         } catch (Exception e) {
+            System.err.println("Error al cargar datos del formulario: " + e.getMessage());
         }
     }
 }

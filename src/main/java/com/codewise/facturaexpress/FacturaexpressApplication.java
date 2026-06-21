@@ -67,8 +67,7 @@ public class FacturaexpressApplication {
 	 */
 	@Bean
 	public ServletRegistrationBean<LogoutServlet> logoutServlet() {
-		ServletRegistrationBean<LogoutServlet> bean = new ServletRegistrationBean<>(new LogoutServlet(), "/logout");
-		return bean;
+		return new ServletRegistrationBean<>(new LogoutServlet(), "/logout");
 	}
 
 	/**

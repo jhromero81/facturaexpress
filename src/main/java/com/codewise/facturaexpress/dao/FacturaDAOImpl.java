@@ -79,7 +79,7 @@ public class FacturaDAOImpl implements FacturaDAO {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    throw new RuntimeException("Error al cerrar conexion", e);
+                    System.err.println("Error al cerrar conexion: " + e.getMessage());
                 }
             }
         }
@@ -172,7 +172,7 @@ public class FacturaDAOImpl implements FacturaDAO {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    throw new RuntimeException("Error al cerrar conexion", e);
+                    System.err.println("Error al cerrar conexion: " + e.getMessage());
                 }
             }
         }

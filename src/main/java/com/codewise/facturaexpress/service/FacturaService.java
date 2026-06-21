@@ -17,7 +17,7 @@ public class FacturaService {
         this.productoDAO = new ProductoDAOImpl();
     }
 
-    public Factura crearFactura(Factura factura) {
+    public void crearFactura(Factura factura) {
         if (factura.getClienteId() == null) {
             throw new IllegalArgumentException("El ID del cliente es obligatorio");
         }
@@ -39,13 +39,11 @@ public class FacturaService {
 
         factura.setTotal(total);
         factura.setEstado("PENDIENTE");
-        Factura creada = facturaDAO.guardar(factura);
+        facturaDAO.guardar(factura);
 
-        for (DetalleFactura detalle : creada.getDetalles()) {
+        for (DetalleFactura detalle : factura.getDetalles()) {
             productoDAO.descontarStock(detalle.getProductoId(), detalle.getCantidad());
         }
-
-        return creada;
     }
 
     public Optional<Factura> buscarPorId(Long id) {
@@ -59,7 +57,7 @@ public class FacturaService {
         return facturaDAO.listarTodos();
     }
 
-    public Factura actualizarEstado(Long id, String nuevoEstado) {
+    public void actualizarEstado(Long id, String nuevoEstado) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de factura invalido");
         }
@@ -69,7 +67,7 @@ public class FacturaService {
         Factura factura = facturaDAO.buscarPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Factura no encontrada con id: " + id));
         factura.setEstado(nuevoEstado.toUpperCase());
-        return facturaDAO.actualizar(factura);
+        facturaDAO.actualizar(factura);
     }
 
     public void eliminarFactura(Long id) {

@@ -63,15 +63,30 @@
 
 <%-- Área principal: topbar con título, estado DIAN y usuario + contenido dinámico --%>
 <div class="fx-main-area">
-  <div class="fx-topbar">
-    <span class="fx-topbar-title"><%= pageTitle %></span>
-    <div class="fx-topbar-dian"><span class="pulse-dot"></span> DIAN SINCRONIZADO</div>
-    <div class="fx-topbar-user">
-      <div class="fx-topbar-user-info">
-        <div class="fx-topbar-user-name"><%= usuario.getNombre() %></div>
-        <div class="fx-topbar-user-role"><%= usuario.getRol() %></div>
+    <div class="fx-topbar">
+      <span class="fx-topbar-title"><%= pageTitle %></span>
+      <div class="fx-topbar-dian"><span class="pulse-dot"></span> DIAN SINCRONIZADO</div>
+      <div class="fx-accessibility-controls" style="display:flex;align-items:center;gap:4px;">
+        <button id="darkModeControl" class="accessibility-option" style="background:rgba(26,188,156,0.1);border:none;border-radius:20px;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Modo oscuro">
+          <i class="material-icons" style="font-size:16px;color:#1abc9c;">dark_mode</i>
+          <span style="font-size:11px;font-weight:600;color:#1abc9c;text-transform:uppercase;">Oscuro</span>
+        </button>
+        <button id="highContrastControl" class="accessibility-option" style="background:rgba(26,188,156,0.1);border:none;border-radius:20px;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Alto contraste">
+          <i class="material-icons" style="font-size:16px;color:#1abc9c;">contrast</i>
+          <span style="font-size:11px;font-weight:600;color:#1abc9c;text-transform:uppercase;">Contraste</span>
+        </button>
+        <select id="fontSizeControl" style="background:rgba(26,188,156,0.1);border:none;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:600;color:#1abc9c;cursor:pointer;outline:none;font-family:inherit;">
+          <option value="small">Peque&ntilde;o</option>
+          <option value="medium" selected>Mediano</option>
+          <option value="large">Grande</option>
+        </select>
       </div>
-      <i class="material-icons" style="color:#1a2535;font-size:30px;">account_circle</i>
+      <div class="fx-topbar-user">
+        <div class="fx-topbar-user-info">
+          <div class="fx-topbar-user-name"><%= usuario.getNombre() %></div>
+          <div class="fx-topbar-user-role"><%= usuario.getRol() %></div>
+        </div>
+        <i class="material-icons" style="color:#1a2535;font-size:30px;">account_circle</i>
+      </div>
     </div>
-  </div>
   <div class="fx-content">

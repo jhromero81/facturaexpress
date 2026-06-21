@@ -115,4 +115,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script src="<%= ctx %>/js/dashboard.js"></script>
 <%@ include file="/WEB-INF/jsp/layout/footer.jsp" %>

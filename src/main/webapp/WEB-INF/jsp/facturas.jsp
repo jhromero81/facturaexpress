@@ -79,4 +79,5 @@ function filtrarFacturas(valor) {
 }
 </script>
 
+<script src="<%= ctx %>/js/facturacion.js"></script>
 <%@ include file="/WEB-INF/jsp/layout/footer.jsp" %>

@@ -198,4 +198,5 @@ document.getElementById('buscarProducto').addEventListener('input', function() {
 .producto-card:active { transform: scale(0.98); }
 </style>
 
+<script src="<%= ctx %>/js/ventas.js"></script>
 <%@ include file="/WEB-INF/jsp/layout/footer.jsp" %>
