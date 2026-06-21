@@ -5,8 +5,10 @@ import com.codewise.facturaexpress.model.Cliente;
 import com.codewise.facturaexpress.model.DetalleFactura;
 import com.codewise.facturaexpress.model.Factura;
 import com.codewise.facturaexpress.model.Producto;
+import com.codewise.facturaexpress.model.Usuario;
 import com.codewise.facturaexpress.service.ClienteService;
 import com.codewise.facturaexpress.service.FacturaService;
+import com.codewise.facturaexpress.service.LogAuditoriaService;
 import com.codewise.facturaexpress.service.ProductoService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -24,12 +26,14 @@ public class FacturaServlet extends HttpServlet {
     private FacturaService facturaService;
     private ClienteService clienteService;
     private ProductoService productoService;
+    private LogAuditoriaService logService;
 
     @Override
     public void init() {
         facturaService = new FacturaService();
         clienteService = new ClienteService();
         productoService = new ProductoService();
+        logService = new LogAuditoriaService();
     }
 
     @Override
@@ -40,22 +44,25 @@ public class FacturaServlet extends HttpServlet {
             return;
         }
         req.setAttribute("activeNav", "facturas");
-        req.setAttribute("pageTitle", "Facturas");
         req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         String action = req.getParameter("action");
         if (action == null) action = "listar";
 
         switch (action) {
             case "nuevo":
+                req.setAttribute("pageTitle", "Nueva Factura");
                 mostrarFormularioCreacion(req, resp);
                 break;
             case "detalle":
+                req.setAttribute("pageTitle", "Detalle Factura");
                 mostrarDetalle(req, resp);
                 break;
             case "eliminar":
+                req.setAttribute("pageTitle", "Facturas");
                 eliminarFactura(req, resp);
                 break;
             default:
+                req.setAttribute("pageTitle", "Historial de Facturacion");
                 listarFacturas(req, resp);
         }
     }
@@ -89,7 +96,11 @@ public class FacturaServlet extends HttpServlet {
             req.setAttribute("facturas", facturas);
             req.getRequestDispatcher("/WEB-INF/jsp/facturas.jsp").forward(req, resp);
         } catch (Exception e) {
-            req.setAttribute("error", "Error al listar facturas: " + e.getMessage());
+            StringBuilder sb = new StringBuilder("Error al listar facturas: ").append(e.getMessage());
+            for (Throwable c = e.getCause(); c != null; c = c.getCause()) {
+                sb.append(" | causa: ").append(c.getMessage());
+            }
+            req.setAttribute("error", sb.toString());
             req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
         }
     }
@@ -155,7 +166,9 @@ public class FacturaServlet extends HttpServlet {
             }
 
             factura.setDetalles(detalles);
-            facturaService.crearFactura(factura);
+            Factura creada = facturaService.crearFactura(factura);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "INSERT factura id=" + creada.getId(), "facturas", creada.getId(), req);
 
             req.setAttribute("mensaje", "Factura creada exitosamente");
             req.setAttribute("redirectUrl", req.getContextPath() + "/facturas");
@@ -180,6 +193,8 @@ public class FacturaServlet extends HttpServlet {
             Long id = Long.parseLong(req.getParameter("id"));
             String nuevoEstado = req.getParameter("estado");
             facturaService.actualizarEstado(id, nuevoEstado);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "UPDATE factura id=" + id + " estado=" + nuevoEstado, "facturas", id, req);
             resp.sendRedirect(req.getContextPath() + "/facturas?action=detalle&id=" + id);
         } catch (NumberFormatException e) {
             req.setAttribute("error", "ID de factura invalido");
@@ -195,6 +210,8 @@ public class FacturaServlet extends HttpServlet {
         try {
             Long id = Long.parseLong(req.getParameter("id"));
             facturaService.eliminarFactura(id);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "DELETE factura id=" + id, "facturas", id, req);
             resp.sendRedirect(req.getContextPath() + "/facturas");
         } catch (NumberFormatException e) {
             req.setAttribute("error", "ID de factura invalido");
@@ -209,7 +226,9 @@ public class FacturaServlet extends HttpServlet {
         try {
             req.setAttribute("clientes", clienteService.listarClientes());
             req.setAttribute("productos", productoService.listarProductos());
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         } catch (Exception e) {
+            System.err.println("Error al cargar datos del formulario: " + e.getMessage());
         }
     }
 }

@@ -7,34 +7,35 @@
 (function() {
     'use strict';
 
+    // Lee localStorage de forma segura (entornos restringidos pueden lanzar excepción)
     let prefs = null;
-    const rawPrefs = localStorage.getItem('facturaexpress_prefs');
-    const rawConfig = localStorage.getItem('facturaexpress_config');
+    try {
+        const rawPrefs = localStorage.getItem('facturaexpress_prefs');
+        const rawConfig = localStorage.getItem('facturaexpress_config');
 
-    // Parseo seguro de JSON sin lanzar excepción
-    const safeParse = (value) => {
-        try {
-            return value ? JSON.parse(value) : null;
-        } catch (e) {
-            return null;
-        }
-    };
+        const safeParse = (value) => {
+            try {
+                return value ? JSON.parse(value) : null;
+            } catch (e) {
+                return null;
+            }
+        };
 
-    // Intenta leer preferencias del storage nuevo (facturaexpress_prefs)
-    prefs = safeParse(rawPrefs);
-    // Fallback: migra desde el storage anterior (facturaexpress_config)
-    if (!prefs) {
-        const configData = safeParse(rawConfig);
-        if (configData && typeof configData === 'object') {
-            prefs = {
-                modoOscuro: configData.modoOscuro || false,
-                altoContraste: configData.altoContraste || false,
-                tamanoTexto: configData.tamanoTexto || 'medium'
-            };
+        prefs = safeParse(rawPrefs);
+        if (!prefs) {
+            const configData = safeParse(rawConfig);
+            if (configData && typeof configData === 'object') {
+                prefs = {
+                    modoOscuro: configData.modoOscuro || false,
+                    altoContraste: configData.altoContraste || false,
+                    tamanoTexto: configData.tamanoTexto || 'medium'
+                };
+            }
         }
+    } catch (e) {
+        prefs = null;
     }
 
-    // Valores por defecto si no hay nada guardado
     if (!prefs) {
         prefs = {
             modoOscuro: false,
@@ -44,11 +45,12 @@
     }
 
     /**
-     * Aplica o remueve una clase CSS en el <body> tan pronto como esté disponible
-     * @param {string} className - Clase a aplicar (ej: 'fx-dark-mode')
-     * @param {boolean} enabled - true para agregar, false para quitar
+     * Aplica clase en <body> y un atributo data- en <html> (disponible
+     * inmediatamente incluso si body aún no existe). Esto elimina el flash
+     * porque <html> ya está presente cuando el script se ejecuta en <head>.
      */
-    const applyBodyClass = (className, enabled) => {
+    const applyTheme = (className, dataAttr, enabled) => {
+        document.documentElement.setAttribute(dataAttr, enabled ? 'true' : '');
         const setClass = () => {
             if (!document.body) return;
             document.body.classList.toggle(className, enabled);
@@ -61,16 +63,10 @@
     };
 
     // Aplica modo oscuro si está habilitado
-    if (prefs.modoOscuro === true) {
-        document.documentElement.setAttribute('data-fx-dark-mode', 'true');
-    }
-    applyBodyClass('fx-dark-mode', prefs.modoOscuro === true);
+    applyTheme('fx-dark-mode', 'data-fx-dark-mode', prefs.modoOscuro === true);
 
     // Aplica alto contraste si está habilitado
-    if (prefs.altoContraste === true) {
-        document.documentElement.setAttribute('data-fx-high-contrast', 'true');
-    }
-    applyBodyClass('fx-high-contrast', prefs.altoContraste === true);
+    applyTheme('fx-high-contrast', 'data-fx-high-contrast', prefs.altoContraste === true);
 
     // Aplica el tamaño de fuente guardado
     const sizes = { small: '12px', medium: '15px', large: '18px' };

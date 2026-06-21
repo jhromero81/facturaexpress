@@ -2,7 +2,9 @@ package com.codewise.facturaexpress.controller;
 
 import com.codewise.facturaexpress.config.AuthUtil;
 import com.codewise.facturaexpress.model.Cliente;
+import com.codewise.facturaexpress.model.Usuario;
 import com.codewise.facturaexpress.service.ClienteService;
+import com.codewise.facturaexpress.service.LogAuditoriaService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,10 +17,12 @@ import java.util.Optional;
 public class ClienteServlet extends HttpServlet {
 
     private ClienteService clienteService;
+    private LogAuditoriaService logService;
 
     @Override
     public void init() {
         clienteService = new ClienteService();
+        logService = new LogAuditoriaService();
     }
 
     @Override
@@ -110,12 +114,15 @@ public class ClienteServlet extends HttpServlet {
             cliente.setTelefono(req.getParameter("telefono"));
             cliente.setDireccion(req.getParameter("direccion"));
 
-            clienteService.guardarCliente(cliente);
+            Cliente guardado = clienteService.guardarCliente(cliente);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "INSERT cliente id=" + guardado.getId(), "clientes", guardado.getId(), req);
             req.setAttribute("mensaje", "Cliente registrado exitosamente");
             req.setAttribute("redirectUrl", req.getContextPath() + "/clientes");
             req.getRequestDispatcher("/WEB-INF/jsp/confirmacion.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/cliente-form.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al guardar cliente: " + e.getMessage());
@@ -135,9 +142,12 @@ public class ClienteServlet extends HttpServlet {
             cliente.setDireccion(req.getParameter("direccion"));
 
             clienteService.actualizarCliente(cliente);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "UPDATE cliente id=" + id, "clientes", id, req);
             resp.sendRedirect(req.getContextPath() + "/clientes");
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.setAttribute("cliente", construirClienteDesdeRequest(req));
             req.getRequestDispatcher("/WEB-INF/jsp/cliente-form.jsp").forward(req, resp);
         } catch (Exception e) {
@@ -151,6 +161,8 @@ public class ClienteServlet extends HttpServlet {
         try {
             Long id = Long.parseLong(req.getParameter("id"));
             clienteService.eliminarCliente(id);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "DELETE cliente id=" + id, "clientes", id, req);
             resp.sendRedirect(req.getContextPath() + "/clientes");
         } catch (NumberFormatException e) {
             req.setAttribute("error", "ID de cliente invalido");

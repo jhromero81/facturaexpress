@@ -22,10 +22,11 @@
   <title><%= pageTitle %> - FacturaExpress</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="<%= ctx %>/css/styles.css">
+  <link rel="stylesheet" href="<%= ctx %>/css/styles.css?v=3">
   <script src="<%= ctx %>/js/accessibility-bootstrap.js"></script>
 </head>
 <body>
+<script>!function(){try{var p=JSON.parse(localStorage.getItem('facturaexpress_prefs'));if(p){document.documentElement.setAttribute('data-fx-dark-mode',p.modoOscuro?'true':'');document.documentElement.setAttribute('data-fx-high-contrast',p.altoContraste?'true':'');if(p.modoOscuro)document.body.classList.add('fx-dark-mode');if(p.altoContraste)document.body.classList.add('fx-high-contrast');var s={small:'12px',medium:'15px',large:'18px'};document.documentElement.style.fontSize=s[p.tamanoTexto]||'15px'}}catch(e){}}();</script>
 
 <%-- Sidebar izquierdo fijo con logo, navegación principal y botón de cierre de sesión --%>
 <%-- La navegación resalta el ítem activo según activeNav --%>
@@ -53,6 +54,21 @@
     <a class="fx-nav-item <%= "reportes".equals(activeNav) ? "fx-active" : "" %>" href="<%= ctx %>/reportes">
       <i class="material-icons">bar_chart</i> Reportes y Estad&iacute;sticas
     </a>
+    <a class="fx-nav-item <%= "configuracion".equals(activeNav) ? "fx-active" : "" %>" href="<%= ctx %>/configuracion">
+      <i class="material-icons">settings</i> Configuraci&oacute;n
+    </a>
+    <a class="fx-nav-item <%= "errores".equals(activeNav) ? "fx-active" : "" %>" href="<%= ctx %>/errores">
+      <i class="material-icons">bug_report</i> Errores del Sistema
+    </a>
+    <a class="fx-nav-item <%= "logs".equals(activeNav) ? "fx-active" : "" %>" href="<%= ctx %>/logs">
+      <i class="material-icons">receipt_long</i> Auditor&iacute;a
+    </a>
+    <a class="fx-nav-item <%= "usuarios".equals(activeNav) ? "fx-active" : "" %>" href="<%= ctx %>/usuarios">
+      <i class="material-icons">admin_panel_settings</i> Usuarios
+    </a>
+    <a class="fx-nav-item <%= "backup".equals(activeNav) ? "fx-active" : "" %>" href="<%= ctx %>/backup">
+      <i class="material-icons">backup</i> Respaldos
+    </a>
   </div>
   <div class="fx-sidebar-footer">
     <a class="fx-nav-item fx-logout" href="#" id="showLogoutBtn">
@@ -63,15 +79,30 @@
 
 <%-- Área principal: topbar con título, estado DIAN y usuario + contenido dinámico --%>
 <div class="fx-main-area">
-  <div class="fx-topbar">
-    <span class="fx-topbar-title"><%= pageTitle %></span>
-    <div class="fx-topbar-dian"><span class="pulse-dot"></span> DIAN SINCRONIZADO</div>
-    <div class="fx-topbar-user">
-      <div class="fx-topbar-user-info">
-        <div class="fx-topbar-user-name"><%= usuario.getNombre() %></div>
-        <div class="fx-topbar-user-role"><%= usuario.getRol() %></div>
+    <div class="fx-topbar">
+      <span class="fx-topbar-title"><%= pageTitle %></span>
+      <div class="fx-topbar-dian"><span class="pulse-dot"></span> DIAN SINCRONIZADO</div>
+      <div class="fx-accessibility-controls" style="display:flex;align-items:center;gap:4px;">
+        <button id="darkModeControl" class="accessibility-option" style="background:rgba(26,188,156,0.1);border:none;border-radius:20px;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Modo oscuro">
+          <i class="material-icons" style="font-size:16px;">dark_mode</i>
+          <span style="font-size:11px;font-weight:600;text-transform:uppercase;">Oscuro</span>
+        </button>
+        <button id="highContrastControl" class="accessibility-option" style="background:rgba(26,188,156,0.1);border:none;border-radius:20px;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="Alto contraste">
+          <i class="material-icons" style="font-size:16px;">contrast</i>
+          <span style="font-size:11px;font-weight:600;text-transform:uppercase;">Contraste</span>
+        </button>
+        <select id="fontSizeControl" style="background:rgba(26,188,156,0.1);border:none;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:600;color:#1abc9c;cursor:pointer;outline:none;font-family:inherit;">
+          <option value="small">Peque&ntilde;o</option>
+          <option value="medium" selected>Mediano</option>
+          <option value="large">Grande</option>
+        </select>
       </div>
-      <i class="material-icons" style="color:#1a2535;font-size:30px;">account_circle</i>
+      <div class="fx-topbar-user">
+        <div class="fx-topbar-user-info">
+          <div class="fx-topbar-user-name"><%= usuario.getNombre() %></div>
+          <div class="fx-topbar-user-role"><%= usuario.getRol() %></div>
+        </div>
+        <i class="material-icons" style="color:#1a2535;font-size:30px;">account_circle</i>
+      </div>
     </div>
-  </div>
   <div class="fx-content">

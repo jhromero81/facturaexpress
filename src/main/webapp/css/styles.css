@@ -286,14 +286,14 @@ body.fx-login-page {
 .txn-time   { font-size: 11px; color: var(--text-muted); }
 .txn-amount { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent); font-size: 14px; margin-left: auto; }
 
-/* Panel de pago/resumen (factura) con fondo oscuro */
-.payment-panel { background: var(--sidebar-bg); border-radius: 10px; padding: 22px; color: #fff; transition: background-color 0.3s ease; }
+/* Panel de pago/resumen (factura) */
+.payment-panel { background: var(--card-bg); border-radius: 10px; padding: 22px; transition: background-color 0.3s ease, color 0.3s ease; }
 .payment-panel h6 { color: var(--accent); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 18px; }
 .pay-row  { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; }
-.pay-lbl  { color: #8da0b3; }
-.pay-val  { color: #ecf0f1; font-family: 'Space Mono', monospace; font-weight: 600; }
-.pay-divider { border-top: 1px solid rgba(255,255,255,0.1); margin: 12px 0; }
-.total-lbl { font-size: 13px; color: #8da0b3; margin-bottom: 4px; }
+.pay-lbl  { color: var(--text-muted); }
+.pay-val  { color: var(--text-dark); font-family: 'Space Mono', monospace; font-weight: 600; }
+.pay-divider { border-top: 1px solid var(--border); margin: 12px 0; }
+.total-lbl { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
 .total-val { font-size: 28px; font-weight: 700; color: var(--accent); font-family: 'Space Mono', monospace; }
 
 /* === MODAL DE CIERRE DE SESIÓN === */
@@ -622,6 +622,7 @@ table.highlight > tbody > tr:hover        { background: rgba(26,188,156,0.04) !i
 body.fx-dark-mode,
 body.fx-dark-mode .fx-main-area {
   background: #121212 !important;
+  --text-dark: #e0e0e0;
 }
 body.fx-dark-mode .fx-sidebar {
   background: #0a0f14 !important;
@@ -634,7 +635,8 @@ body.fx-dark-mode .client-card {
   border-color: #2c3e3f !important;
 }
 body.fx-dark-mode .payment-panel {
-  background: #0a0f14 !important;
+  background: #1e2a32 !important;
+  color: #e0e0e0 !important;
 }
 body.fx-dark-mode .fx-topbar,
 body.fx-dark-mode .fx-footer {
@@ -655,6 +657,11 @@ body.fx-dark-mode .input-field input {
 }
 body.fx-dark-mode .input-field input:focus {
   border-bottom-color: #1abc9c !important;
+  box-shadow: 0 1px 0 0 #1abc9c !important;
+}
+body.fx-dark-mode .input-field input:focus + label,
+body.fx-dark-mode .input-field input:focus ~ label {
+  color: #1abc9c !important;
 }
 body.fx-dark-mode table tbody tr {
   border-bottom-color: #2c3e3f !important;
@@ -842,7 +849,1248 @@ body,
 .error-container h3 { font-family: 'Space Mono', monospace; font-size: 22px; margin: 16px 0; }
 .error-container p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
 
-/* Responsive: en pantallas pequeñas la cuadrícula de detalle se apila a 1 columna */
+/* ============================================ */
+/* CONFIGURACION MODULE */
+/* ============================================ */
+
+.config-section-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.5rem 1.8rem;
+  margin-bottom: 1.8rem;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+}
+.config-section-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 12px 22px rgba(26,188,156,0.08);
+}
+.config-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid rgba(26,188,156,0.2);
+  padding-bottom: 12px;
+}
+.config-title i {
+  font-size: 28px;
+  color: var(--accent);
+  background: rgba(26,188,156,0.1);
+  padding: 8px;
+  border-radius: 14px;
+}
+.config-title h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-dark);
+  font-family: 'Space Mono', monospace;
+  letter-spacing: -0.2px;
+}
+.config-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 400;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1.2rem;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.info-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #5b6e7c;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.info-value {
+  font-family: 'Space Mono', monospace;
+  font-weight: 600;
+  color: var(--text-dark);
+  background: #f8fafc;
+  padding: 4px 12px;
+  border-radius: 40px;
+  font-size: 13px;
+}
+.expiry-badge {
+  background: rgba(231, 76, 60, 0.1);
+  color: var(--danger);
+  border-radius: 30px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.action-buttons-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 1rem;
+}
+.btn-outline-accent {
+  background: transparent;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  box-shadow: none;
+  border-radius: 40px;
+  padding: 0 20px;
+  font-weight: 600;
+  text-transform: none;
+  transition: 0.2s;
+  line-height: 36px;
+  height: 36px;
+}
+.btn-outline-accent:hover {
+  background: var(--accent);
+  color: white;
+}
+.toggle-switch-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.access-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border: 1.5px solid var(--accent);
+  border-radius: 40px;
+  background: transparent;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+  outline: none;
+}
+.access-toggle:hover {
+  background: rgba(26,188,156,0.08);
+}
+.access-toggle.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.access-toggle.active:hover {
+  background: var(--accent-dk);
+  border-color: var(--accent-dk);
+}
+.access-toggle i {
+  font-size: 18px;
+}
+.text-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.size-btn,
+.size-badge {
+  background: #f0f2f5;
+  border: 1.5px solid #e0e4e8;
+  border-radius: 40px;
+  padding: 6px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #546e7a;
+  letter-spacing: 0.3px;
+  user-select: none;
+  font-family: inherit;
+  outline: none;
+  line-height: normal;
+}
+.size-btn:hover,
+.size-badge:hover {
+  background: #e8eaed;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.size-btn.active,
+.size-btn.active:hover,
+.size-badge.active,
+.size-badge.active:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.btn-teal-text {
+  color: var(--accent);
+}
+hr {
+  background-color: var(--border);
+  height: 1px;
+  margin: 16px 0;
+}
+
+@media (max-width: 600px) {
+  .config-section-card {
+    padding: 1.2rem;
+  }
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .action-buttons-grid .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Dark mode overrides for config module */
+body.fx-dark-mode .config-section-card,
+body.fx-dark-mode .config-section-card:hover {
+  background: #1e2a32 !important;
+  color: #e0e0e0 !important;
+  border-color: #2c3e3f !important;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.3) !important;
+}
+body.fx-dark-mode .config-title h3 {
+  color: #e0e0e0 !important;
+}
+.config-card-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid rgba(26,188,156,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+.config-card-title i {
+  font-size: 22px;
+  color: var(--accent);
+}
+body.fx-dark-mode .config-card-title {
+  color: #f0f0f0 !important;
+  border-bottom-color: rgba(26,188,156,0.25) !important;
+}
+body.fx-dark-mode .info-value {
+  background: #2c3e50 !important;
+  color: #cfd8dc !important;
+}
+body.fx-dark-mode .info-label {
+  color: #96a8b8 !important;
+}
+body.fx-dark-mode .config-sub {
+  color: #78909c !important;
+}
+body.fx-dark-mode .size-btn,
+body.fx-dark-mode .size-badge {
+  background: #2c3e50 !important;
+  color: #cfd8dc !important;
+  border-color: #4a6a6f !important;
+}
+body.fx-dark-mode .size-btn:hover,
+body.fx-dark-mode .size-badge:hover {
+  background: #34495e !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+body.fx-dark-mode .size-btn.active,
+body.fx-dark-mode .size-btn.active:hover,
+body.fx-dark-mode .size-badge.active,
+body.fx-dark-mode .size-badge.active:hover {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: white !important;
+}
+body.fx-dark-mode .btn-outline-accent {
+  border-color: #1abc9c !important;
+  color: #1abc9c !important;
+}
+body.fx-dark-mode .btn-outline-accent:hover {
+  background: #1abc9c !important;
+  color: #fff !important;
+}
+body.fx-dark-mode .access-toggle {
+  border-color: #1abc9c !important;
+  color: #1abc9c !important;
+  background: transparent !important;
+}
+body.fx-dark-mode .access-toggle:hover {
+  background: rgba(26,188,156,0.15) !important;
+}
+body.fx-dark-mode .access-toggle.active {
+  background: #1abc9c !important;
+  color: #fff !important;
+}
+body.fx-dark-mode .access-toggle.active:hover {
+  background: #148f77 !important;
+}
+
+/* High contrast overrides for config module */
+body.fx-high-contrast .config-section-card {
+  background: #fffbd6 !important;
+  border: 2px solid black !important;
+  color: #000 !important;
+  box-shadow: none !important;
+}
+body.fx-high-contrast .config-section-card:hover {
+  border-color: #000 !important;
+  box-shadow: none !important;
+}
+body.fx-high-contrast .config-title h3 {
+  color: #000 !important;
+}
+body.fx-high-contrast .config-sub {
+  color: #000 !important;
+}
+body.fx-high-contrast .info-value {
+  background: #fff !important;
+  color: #000 !important;
+  border: 1px solid #000 !important;
+}
+body.fx-high-contrast .info-label {
+  color: #000 !important;
+}
+body.fx-high-contrast .expiry-badge {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .size-btn,
+body.fx-high-contrast .size-badge {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .size-btn:hover:not(.active),
+body.fx-high-contrast .size-badge:hover:not(.active) {
+  background: #ffeb3b !important;
+  color: #000 !important;
+  border-color: #000 !important;
+}
+body.fx-high-contrast .size-btn.active,
+body.fx-high-contrast .size-btn.active:hover,
+body.fx-high-contrast .size-badge.active,
+body.fx-high-contrast .size-badge.active:hover {
+  background: #000 !important;
+  color: #ff0 !important;
+  border-color: #ff0 !important;
+}
+body.fx-high-contrast .btn-outline-accent {
+  background: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+}
+body.fx-high-contrast .btn-outline-accent:hover {
+  background: #ff0 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .access-toggle {
+  border: 2px solid #000 !important;
+  color: #000 !important;
+  background: #fff !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .access-toggle:hover {
+  background: #ffeb3b !important;
+}
+body.fx-high-contrast .access-toggle.active {
+  background: #000 !important;
+  color: #ff0 !important;
+  border-color: #ff0 !important;
+}
+body.fx-high-contrast .access-toggle.active:hover {
+  background: #ff0 !important;
+  color: #000 !important;
+}
+
+/* ============================================ */
+/* OVERRIDES COMPLETOS - Modo Oscuro */
+/* ============================================ */
+
+/* Botones en modo oscuro */
+body.fx-dark-mode .btn-teal {
+  background-color: #1abc9c !important;
+  color: #fff !important;
+}
+body.fx-dark-mode .btn-teal:hover {
+  background-color: #148f77 !important;
+}
+body.fx-dark-mode .btn-dark {
+  background-color: #34495e !important;
+  color: #ecf0f1 !important;
+}
+body.fx-dark-mode .btn-dark:hover {
+  background-color: #2c3e50 !important;
+}
+body.fx-dark-mode .btn-flat {
+  color: #b0bec5 !important;
+}
+body.fx-dark-mode .btn-flat:hover {
+  background: rgba(255,255,255,0.08) !important;
+}
+body.fx-dark-mode .btn-cancel-compact {
+  border-color: #455a64 !important;
+  color: #cfd8dc !important;
+  background: transparent !important;
+}
+body.fx-dark-mode .btn-cancel-compact:hover {
+  background: #37474f !important;
+}
+body.fx-dark-mode .btn-logout-compact {
+  background: linear-gradient(135deg, #c0392b, #922b21) !important;
+}
+body.fx-dark-mode .btn-small {
+  color: #e0e0e0 !important;
+}
+body.fx-dark-mode .btn-finalizar {
+  background-color: #1abc9c !important;
+  color: #fff !important;
+}
+body.fx-dark-mode .btn-finalizar:hover {
+  background-color: #148f77 !important;
+}
+
+/* Sidebar en modo oscuro */
+body.fx-dark-mode .fx-nav-item {
+  color: #8da0b3 !important;
+}
+body.fx-dark-mode .fx-nav-item:hover {
+  color: #fff !important;
+  background-color: rgba(255,255,255,0.08) !important;
+}
+body.fx-dark-mode .fx-nav-item.fx-active {
+  color: #fff !important;
+  background-color: rgba(26,188,156,0.2) !important;
+  border-left-color: #1abc9c !important;
+}
+body.fx-dark-mode .fx-nav-item.fx-logout {
+  color: rgba(231,76,60,0.7) !important;
+}
+body.fx-dark-mode .fx-nav-item.fx-logout:hover {
+  color: #e74c3c !important;
+  background-color: rgba(231,76,60,0.15) !important;
+}
+body.fx-dark-mode .fx-logo-text {
+  color: #e0e0e0 !important;
+}
+
+/* Topbar en modo oscuro */
+body.fx-dark-mode .fx-topbar-dian {
+  color: #1abc9c !important;
+}
+body.fx-dark-mode .fx-topbar-user-role {
+  color: #78909c !important;
+}
+body.fx-dark-mode .fx-topbar-user-info {
+  color: #e0e0e0 !important;
+}
+
+/* Footer en modo oscuro */
+body.fx-dark-mode .fx-footer span {
+  color: #78909c !important;
+}
+body.fx-dark-mode .fx-f-status {
+  color: #1abc9c !important;
+}
+
+/* Tablas en modo oscuro */
+body.fx-dark-mode table {
+  color: #cfd8dc !important;
+}
+body.fx-dark-mode table td {
+  border-bottom-color: #2c3e3f !important;
+}
+body.fx-dark-mode table.highlight > tbody > tr:hover {
+  background: rgba(26,188,156,0.12) !important;
+}
+
+/* Formularios en modo oscuro */
+body.fx-dark-mode select,
+body.fx-dark-mode .browser-default {
+  background: #1e2a32 !important;
+  color: #cfd8dc !important;
+  border-color: #4a6a6f !important;
+}
+body.fx-dark-mode textarea {
+  background: #1e2a32 !important;
+  color: #cfd8dc !important;
+  border-color: #4a6a6f !important;
+}
+body.fx-dark-mode .input-field .prefix {
+  color: #78909c !important;
+}
+body.fx-dark-mode .switch label .lever {
+  background-color: #455a64 !important;
+}
+
+/* Form card en modo oscuro */
+body.fx-dark-mode .form-card {
+  background: #1e2a32 !important;
+  color: #e0e0e0 !important;
+}
+
+/* Modal genérico en modo oscuro */
+body.fx-dark-mode .modal-overlay {
+  background: rgba(0,0,0,0.7) !important;
+}
+body.fx-dark-mode .modal-box {
+  background: #1e2a32 !important;
+  color: #e0e0e0 !important;
+}
+body.fx-dark-mode .modal-title {
+  color: #e0e0e0 !important;
+}
+body.fx-dark-mode .modal-close {
+  color: #90a4ae !important;
+}
+body.fx-dark-mode .modal-close:hover {
+  color: #cfd8dc !important;
+}
+
+/* Loading overlay en modo oscuro */
+body.fx-dark-mode .loading-content {
+  background: #1e2a32 !important;
+}
+body.fx-dark-mode .loading-content p {
+  color: #cfd8dc !important;
+}
+
+/* Detail item en modo oscuro */
+body.fx-dark-mode .detail-label {
+  color: #96a8b8 !important;
+}
+body.fx-dark-mode .detail-value {
+  color: #e0e0e0 !important;
+}
+
+/* Badges en modo oscuro */
+body.fx-dark-mode .badge-sent {
+  background: rgba(26,188,156,0.15) !important;
+  color: #1abc9c !important;
+}
+body.fx-dark-mode .pulse-dot {
+  background: #1abc9c !important;
+}
+
+/* Payment panel sub-elementos en modo oscuro */
+body.fx-dark-mode .pay-lbl {
+  color: #8da0b3 !important;
+}
+body.fx-dark-mode .pay-val {
+  color: #ecf0f1 !important;
+}
+
+/* Transaction list en modo oscuro */
+body.fx-dark-mode .txn-list li {
+  border-bottom-color: #2c3e3f !important;
+  color: #cfd8dc !important;
+}
+body.fx-dark-mode .txn-icon-box {
+  background: rgba(26,188,156,0.15) !important;
+  color: #1abc9c !important;
+}
+body.fx-dark-mode .txn-time {
+  color: #78909c !important;
+}
+body.fx-dark-mode .txn-num {
+  color: #e0e0e0 !important;
+}
+body.fx-dark-mode .txn-amount {
+  color: #1abc9c !important;
+}
+
+/* Report toolbar en modo oscuro */
+body.fx-dark-mode .report-toolbar {
+  background: rgba(255,255,255,0.03) !important;
+}
+body.fx-dark-mode .tab-btn {
+  border-color: #455a64 !important;
+  color: #b0bec5 !important;
+  background: transparent !important;
+}
+body.fx-dark-mode .tab-btn.active,
+body.fx-dark-mode .tab-btn:hover {
+  background: #1abc9c !important;
+  color: #fff !important;
+  border-color: #1abc9c !important;
+}
+
+/* Quantity controls en modo oscuro */
+body.fx-dark-mode .qty-btn {
+  border-color: #455a64 !important;
+  color: #b0bec5 !important;
+}
+body.fx-dark-mode .qty-btn:hover {
+  background: #1abc9c !important;
+  color: #fff !important;
+  border-color: #1abc9c !important;
+}
+body.fx-dark-mode .qty-val {
+  color: #cfd8dc !important;
+}
+
+/* Varios textos en modo oscuro */
+body.fx-dark-mode .nota-genera {
+  color: #78909c !important;
+}
+body.fx-dark-mode .section-heading {
+  color: #78909c !important;
+}
+body.fx-dark-mode .chart-label {
+  color: #78909c !important;
+}
+body.fx-dark-mode hr {
+  background-color: #2c3e3f !important;
+}
+
+/* Login page en modo oscuro */
+body.fx-dark-mode.fx-login-page {
+  background: #121212 !important;
+}
+body.fx-dark-mode .login-card {
+  background: #1e2a32 !important;
+  color: #e0e0e0 !important;
+}
+body.fx-dark-mode .logo-box {
+  background: #1abc9c !important;
+}
+body.fx-dark-mode .logo-text {
+  color: #e0e0e0 !important;
+}
+body.fx-dark-mode .login-subtitle {
+  color: #90a4ae !important;
+}
+body.fx-dark-mode .login-footer {
+  color: #78909c !important;
+}
+body.fx-dark-mode .btn-login {
+  background-color: #1abc9c !important;
+  color: #fff !important;
+}
+body.fx-dark-mode .btn-login:hover {
+  background-color: #148f77 !important;
+}
+body.fx-dark-mode .login-access-nav .btn-floating {
+  background: #1e2a32 !important;
+  border-color: #4a6a6f !important;
+}
+body.fx-dark-mode .login-access-nav .btn-floating i {
+  color: #b0bec5 !important;
+}
+body.fx-dark-mode .login-access-nav .btn-floating:hover {
+  background: #1abc9c !important;
+}
+body.fx-dark-mode .login-access-nav .btn-floating:hover i {
+  color: #fff !important;
+}
+body.fx-dark-mode .dian-badge {
+  background: rgba(26,188,156,0.15) !important;
+  color: #1abc9c !important;
+}
+body.fx-dark-mode .error-msg {
+  color: #ef5350 !important;
+}
+body.fx-dark-mode.fx-login-page::before {
+  background: radial-gradient(circle, rgba(26,188,156,0.06) 0%, transparent 70%) !important;
+}
+body.fx-dark-mode.fx-login-page::after {
+  background: radial-gradient(circle, rgba(26,188,156,0.04) 0%, transparent 70%) !important;
+}
+body.fx-dark-mode #togglePassword {
+  color: #b0bec5 !important;
+}
+
+/* Fallback: html[data-fx-dark-mode] como respaldo para login (aplicado por
+   accessibility-bootstrap.js antes de que <body> exista, eliminando el flash) */
+html[data-fx-dark-mode="true"] body.fx-login-page {
+  background: #121212 !important;
+}
+html[data-fx-dark-mode="true"] .login-card {
+  background: #1e2a32 !important;
+  color: #e0e0e0 !important;
+}
+
+/* Confirm/Error pages en modo oscuro */
+body.fx-dark-mode .confirm-box {
+  color: #e0e0e0 !important;
+}
+body.fx-dark-mode .confirm-box p {
+  color: #90a4ae !important;
+}
+body.fx-dark-mode .error-container h3 {
+  color: #e0e0e0 !important;
+}
+body.fx-dark-mode .error-container p {
+  color: #90a4ae !important;
+}
+
+/* Logout modal sub-elementos en modo oscuro */
+body.fx-dark-mode .logout-icon {
+  background: rgba(26,188,156,0.15) !important;
+}
+body.fx-dark-mode .logout-icon i {
+  color: #1abc9c !important;
+}
+body.fx-dark-mode .logout-header h4 {
+  color: #fff !important;
+}
+body.fx-dark-mode .logout-header p {
+  color: #8da0b3 !important;
+}
+body.fx-dark-mode .session-title-compact {
+  color: #78909c !important;
+}
+body.fx-dark-mode .session-label-compact {
+  color: #78909c !important;
+}
+body.fx-dark-mode .security-note-compact {
+  color: #78909c !important;
+}
+
+/* ============================================ */
+/* OVERRIDES COMPLETOS - Alto Contraste */
+/* ============================================ */
+
+/* Botones en alto contraste */
+body.fx-high-contrast .btn-teal {
+  background-color: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .btn-teal:hover {
+  background-color: #ff0 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .btn-dark {
+  background-color: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .btn-dark:hover {
+  background-color: #ff0 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .btn-flat {
+  background: transparent !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .btn-flat:hover {
+  background: #000 !important;
+  color: #ff0 !important;
+}
+body.fx-high-contrast .btn-cancel-compact {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .btn-cancel-compact:hover {
+  background: #000 !important;
+  color: #ff0 !important;
+}
+body.fx-high-contrast .btn-logout-compact {
+  background: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .btn-logout-compact:hover {
+  background: #ff0 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .btn-finalizar {
+  background: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .btn-finalizar:hover {
+  background: #ff0 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .btn-small {
+  background: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .btn-small:hover {
+  background: #ff0 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .btn-login {
+  background: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .btn-login:hover {
+  background: #ff0 !important;
+  color: #000 !important;
+}
+
+/* Sidebar en alto contraste */
+body.fx-high-contrast .fx-nav-item {
+  color: #fff !important;
+  border-left: 3px solid transparent !important;
+}
+body.fx-high-contrast .fx-nav-item:hover,
+body.fx-high-contrast .fx-nav-item.fx-active {
+  background: #ffeb3b !important;
+  color: #000 !important;
+  border-left-color: #000 !important;
+}
+body.fx-high-contrast .fx-nav-item.fx-logout {
+  color: #ff6b6b !important;
+}
+body.fx-high-contrast .fx-nav-item.fx-logout:hover {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+body.fx-high-contrast .fx-logo-text {
+  color: #ff0 !important;
+}
+body.fx-high-contrast .fx-logo-box {
+  background: #ff0 !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+
+/* Topbar en alto contraste */
+body.fx-high-contrast .fx-topbar-dian {
+  color: #ff0 !important;
+}
+body.fx-high-contrast .fx-topbar-user-info {
+  color: #000 !important;
+}
+body.fx-high-contrast .fx-topbar-user-role {
+  color: #000 !important;
+}
+
+/* Footer en alto contraste */
+body.fx-high-contrast .fx-footer {
+  background: #000 !important;
+  border-top: 2px solid #ff0 !important;
+}
+body.fx-high-contrast .fx-footer span {
+  color: #fff !important;
+}
+body.fx-high-contrast .fx-f-status {
+  color: #ff0 !important;
+}
+
+/* Tablas en alto contraste */
+body.fx-high-contrast table {
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast table thead {
+  background: #000 !important;
+}
+body.fx-high-contrast table thead th {
+  color: #ff0 !important;
+  border-bottom: 2px solid #ff0 !important;
+}
+body.fx-high-contrast table td {
+  border: 1px solid #000 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast table.striped > tbody > tr:nth-child(odd) {
+  background: #fffbd6 !important;
+}
+body.fx-high-contrast table.highlight > tbody > tr:hover {
+  background: #ffeb3b !important;
+}
+
+/* Formularios en alto contraste */
+body.fx-high-contrast .input-field input,
+body.fx-high-contrast .input-field label {
+  color: #000 !important;
+}
+body.fx-high-contrast .input-field input {
+  border-bottom-color: #000 !important;
+}
+body.fx-high-contrast .input-field input:focus {
+  border-bottom-color: #000 !important;
+  box-shadow: 0 1px 0 0 #000 !important;
+}
+body.fx-high-contrast select,
+body.fx-high-contrast .browser-default {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast textarea {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .input-field .prefix {
+  color: #000 !important;
+}
+body.fx-high-contrast .switch label .lever {
+  background-color: #fff !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .switch label input[type=checkbox]:checked+.lever {
+  background-color: #000 !important;
+}
+body.fx-high-contrast .switch label input[type=checkbox]:checked+.lever:after {
+  background-color: #ff0 !important;
+}
+body.fx-high-contrast .toggle-switch-custom {
+  color: #000 !important;
+}
+
+/* Form card en alto contraste */
+body.fx-high-contrast .form-card {
+  background: #fffbd6 !important;
+  border: 2px solid #000 !important;
+  color: #000 !important;
+}
+
+/* Modal genérico en alto contraste */
+body.fx-high-contrast .modal-overlay {
+  background: rgba(0,0,0,0.7) !important;
+}
+body.fx-high-contrast .modal-box {
+  background: #fff !important;
+  border: 3px solid #000 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .modal-title {
+  color: #000 !important;
+}
+body.fx-high-contrast .modal-close {
+  color: #000 !important;
+}
+body.fx-high-contrast .modal-close:hover {
+  color: #ff0 !important;
+  background: #000 !important;
+}
+
+/* Logout modal en alto contraste */
+body.fx-high-contrast .logout-modal .modal-content {
+  background: #fff !important;
+  border: 3px solid #000 !important;
+}
+body.fx-high-contrast .logout-header {
+  background: #000 !important;
+}
+body.fx-high-contrast .logout-icon {
+  background: #ff0 !important;
+}
+body.fx-high-contrast .logout-icon i {
+  color: #000 !important;
+}
+body.fx-high-contrast .logout-header h4 {
+  color: #ff0 !important;
+}
+body.fx-high-contrast .logout-header p {
+  color: #fff !important;
+}
+body.fx-high-contrast .logout-body {
+  background: #fff !important;
+}
+body.fx-high-contrast .warning-compact {
+  background: #fff !important;
+  border-left: 3px solid #000 !important;
+}
+body.fx-high-contrast .warning-compact strong,
+body.fx-high-contrast .warning-compact span {
+  color: #000 !important;
+}
+body.fx-high-contrast .warning-compact i {
+  color: #000 !important;
+}
+body.fx-high-contrast .session-compact {
+  background: #fffbd6 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .session-title-compact {
+  color: #000 !important;
+}
+body.fx-high-contrast .session-grid {
+  color: #000 !important;
+}
+body.fx-high-contrast .session-label-compact {
+  color: #000 !important;
+}
+body.fx-high-contrast .session-value-compact {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .security-note-compact {
+  color: #000 !important;
+}
+
+/* Loading overlay en alto contraste */
+body.fx-high-contrast .loading-content {
+  background: #fff !important;
+  border: 3px solid #000 !important;
+}
+body.fx-high-contrast .loading-content p {
+  color: #000 !important;
+}
+
+/* Detail item en alto contraste */
+body.fx-high-contrast .detail-label {
+  color: #000 !important;
+}
+body.fx-high-contrast .detail-value {
+  color: #000 !important;
+}
+
+/* Badges en alto contraste */
+body.fx-high-contrast .badge-status {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .badge-sent {
+  background: #fff !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .pulse-dot {
+  background: #000 !important;
+  border: 2px solid #ff0 !important;
+}
+
+/* Payment panel en alto contraste */
+body.fx-high-contrast .pay-lbl {
+  color: #000 !important;
+}
+body.fx-high-contrast .pay-val {
+  color: #000 !important;
+}
+body.fx-high-contrast .total-lbl {
+  color: #000 !important;
+}
+body.fx-high-contrast .total-val {
+  color: #000 !important;
+}
+
+/* Transaction list en alto contraste */
+body.fx-high-contrast .txn-list li {
+  border-bottom-color: #000 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .txn-icon-box {
+  background: #ff0 !important;
+  color: #000 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .txn-num {
+  color: #000 !important;
+}
+body.fx-high-contrast .txn-time {
+  color: #000 !important;
+}
+
+/* Report toolbar en alto contraste */
+body.fx-high-contrast .report-toolbar {
+  background: #fffbd6 !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .tab-btn {
+  border: 2px solid #000 !important;
+  color: #000 !important;
+  background: #fff !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .tab-btn.active,
+body.fx-high-contrast .tab-btn:hover {
+  background: #000 !important;
+  color: #ff0 !important;
+}
+
+/* Quantity controls en alto contraste */
+body.fx-high-contrast .qty-btn {
+  border: 2px solid #000 !important;
+  color: #000 !important;
+  background: #fff !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .qty-btn:hover {
+  background: #000 !important;
+  color: #ff0 !important;
+}
+body.fx-high-contrast .qty-val {
+  color: #000 !important;
+}
+
+/* Varios textos en alto contraste */
+body.fx-high-contrast .nota-genera {
+  color: #000 !important;
+}
+body.fx-high-contrast .section-heading {
+  color: #000 !important;
+}
+body.fx-high-contrast .chart-label {
+  color: #000 !important;
+}
+body.fx-high-contrast hr {
+  background-color: #000 !important;
+}
+body.fx-high-contrast .info-row {
+  border-bottom-color: #000 !important;
+}
+
+/* Login page en alto contraste */
+body.fx-high-contrast.fx-login-page {
+  background: #fff !important;
+}
+body.fx-high-contrast .login-card {
+  background: #fff !important;
+  border: 3px solid #000 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .logo-box {
+  background: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+}
+body.fx-high-contrast .logo-text {
+  color: #000 !important;
+}
+body.fx-high-contrast .login-subtitle {
+  color: #000 !important;
+}
+body.fx-high-contrast .login-footer {
+  color: #000 !important;
+}
+body.fx-high-contrast .dian-badge {
+  background: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+}
+body.fx-high-contrast .login-access-nav .btn-floating {
+  background: #fff !important;
+  border: 2px solid #000 !important;
+}
+body.fx-high-contrast .login-access-nav .btn-floating i {
+  color: #000 !important;
+}
+body.fx-high-contrast .login-access-nav .btn-floating:hover {
+  background: #000 !important;
+}
+body.fx-high-contrast .login-access-nav .btn-floating:hover i {
+  color: #ff0 !important;
+}
+body.fx-high-contrast .error-msg {
+  color: #d32f2f !important;
+  font-weight: 800 !important;
+}
+body.fx-high-contrast .input-field input {
+  border-bottom-color: #000 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast .input-field input:focus {
+  border-bottom-color: #000 !important;
+  box-shadow: 0 1px 0 0 #000 !important;
+}
+body.fx-high-contrast .input-field input:focus + label,
+body.fx-high-contrast .input-field input:focus ~ label {
+  color: #000 !important;
+}
+body.fx-high-contrast .input-field label {
+  color: #000 !important;
+}
+body.fx-high-contrast .input-field .prefix {
+  color: #000 !important;
+}
+body.fx-high-contrast .btn-login {
+  background-color: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+}
+body.fx-high-contrast .btn-login:hover {
+  background-color: #ff0 !important;
+  color: #000 !important;
+}
+body.fx-high-contrast #togglePassword {
+  color: #000 !important;
+}
+
+/* Fallback: html[data-fx-high-contrast] como respaldo para login */
+html[data-fx-high-contrast="true"] body.fx-login-page {
+  background: #fff !important;
+}
+html[data-fx-high-contrast="true"] .login-card {
+  background: #fff !important;
+  border: 3px solid #000 !important;
+  color: #000 !important;
+}
+
+/* Confirm/Error pages en alto contraste */
+body.fx-high-contrast .confirm-box {
+  color: #000 !important;
+}
+body.fx-high-contrast .confirm-box h3 {
+  color: #000 !important;
+}
+body.fx-high-contrast .confirm-box p {
+  color: #000 !important;
+}
+body.fx-high-contrast .error-container h3 {
+  color: #000 !important;
+}
+body.fx-high-contrast .error-container p {
+  color: #000 !important;
+}
+
+/* Empty state en alto contraste */
+body.fx-high-contrast .empty-state {
+  color: #000 !important;
+}
+
+/* Client card en alto contraste */
+body.fx-high-contrast .client-id-tag {
+  color: #000 !important;
+}
+body.fx-high-contrast .client-email {
+  color: #000 !important;
+}
+
+/* Accessibility controls en alto contraste */
+body.fx-high-contrast #fontSizeControl {
+  background: #000 !important;
+  color: #ff0 !important;
+  border: 2px solid #ff0 !important;
+}
+body.fx-high-contrast #fontSizeControl option {
+  background: #000 !important;
+  color: #ff0 !important;
+}
+body.fx-high-contrast .accessibility-option {
+  border-color: #000 !important;
+}
+
+/* ============================================ */
+/* RESPONSIVE */
+/* ============================================ */
 @media (max-width: 600px) {
   .detail-grid { grid-template-columns: 1fr; }
   .fx-content { padding: 16px; }

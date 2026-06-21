@@ -4,17 +4,14 @@ import com.codewise.facturaexpress.config.DatabaseConfig;
 import com.codewise.facturaexpress.model.Usuario;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-/**
- * Implementaci&oacute;n de UsuarioDAO con JDBC.
- * Ejecuta consultas SQL directamente contra la tabla "usuarios".
- */
 public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public Optional<Usuario> buscarPorUsername(String username) {
-        // Busca un usuario activo por su nombre de usuario
         String sql = "SELECT * FROM usuarios WHERE username = ? AND activo = TRUE";
         try (Connection conn = DatabaseConfig.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -32,7 +29,6 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public Usuario guardar(Usuario usuario) {
-        // Inserta un nuevo usuario y recupera el ID autogenerado
         String sql = "INSERT INTO usuarios (username, password_hash, nombre, email, rol) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -48,6 +44,52 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             return usuario;
         } catch (SQLException e) {
             throw new RuntimeException("Error al guardar usuario", e);
+        }
+    }
+
+    @Override
+    public List<Usuario> listarTodos() {
+        String sql = "SELECT * FROM usuarios ORDER BY id";
+        List<Usuario> lista = new ArrayList<>();
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                lista.add(mapearUsuario(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar usuarios", e);
+        }
+        return lista;
+    }
+
+    @Override
+    public Usuario actualizar(Usuario usuario) {
+        String sql = "UPDATE usuarios SET username=?, nombre=?, email=?, rol=?, activo=? WHERE id=?";
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, usuario.getUsername());
+            stmt.setString(2, usuario.getNombre());
+            stmt.setString(3, usuario.getEmail());
+            stmt.setString(4, usuario.getRol());
+            stmt.setBoolean(5, usuario.isActivo());
+            stmt.setLong(6, usuario.getId());
+            stmt.executeUpdate();
+            return usuario;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar usuario", e);
+        }
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        String sql = "DELETE FROM usuarios WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al eliminar usuario", e);
         }
     }
 

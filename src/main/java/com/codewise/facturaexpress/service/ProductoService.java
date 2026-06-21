@@ -60,6 +60,15 @@ public class ProductoService {
         if (producto.getId() == null) {
             throw new IllegalArgumentException("El ID del producto es obligatorio para actualizar");
         }
+        if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del producto es obligatorio");
+        }
+        if (producto.getPrecio() == null || producto.getPrecio().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor a cero");
+        }
+        if (producto.getStock() == null || producto.getStock() < 0) {
+            throw new IllegalArgumentException("El stock no puede ser negativo");
+        }
         return productoDAO.actualizar(producto);
     }
 

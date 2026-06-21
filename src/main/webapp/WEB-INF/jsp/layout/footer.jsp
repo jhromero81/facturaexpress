@@ -1,4 +1,9 @@
 <%-- Footer / layout de cierre: footer, modal de logout, loading overlay y scripts --%>
+<%@ page import="com.codewise.facturaexpress.model.Usuario" %>
+<%
+  Usuario _usr = (Usuario) session.getAttribute("usuario");
+  String _ctx = request.getContextPath();
+%>
   </div><!-- /fx-content -->
 
   <%-- Footer con información legal y estado del sistema --%>
@@ -31,14 +36,14 @@
       <div class="session-compact">
         <div class="session-title-compact"><i class="material-icons tiny">info</i>INFORMACI&Oacute;N DE SESI&Oacute;N</div>
         <div class="session-grid">
-          <div class="session-item"><span class="session-label-compact">Usuario</span><span class="session-value-compact"><%= usuario != null ? usuario.getNombre() : "" %></span></div>
-          <div class="session-item"><span class="session-label-compact">Rol</span><span class="session-value-compact"><%= usuario != null ? usuario.getRol() : "" %></span></div>
+          <div class="session-item"><span class="session-label-compact">Usuario</span><span class="session-value-compact"><%= _usr != null ? _usr.getNombre() : "" %></span></div>
+          <div class="session-item"><span class="session-label-compact">Rol</span><span class="session-value-compact"><%= _usr != null ? _usr.getRol() : "" %></span></div>
         </div>
       </div>
       <%-- Botones: cancelar o confirmar logout --%>
       <div class="modal-buttons-compact">
         <button class="btn btn-cancel-compact modal-close"><i class="material-icons left" style="font-size:16px;">close</i>Cancelar</button>
-        <a href="<%= ctx %>/logout" class="btn btn-logout-compact" id="confirmLogoutBtn"><i class="material-icons left" style="font-size:16px;">logout</i>Salir Ahora</a>
+        <a href="<%= _ctx %>/logout" class="btn btn-logout-compact" id="confirmLogoutBtn"><i class="material-icons left" style="font-size:16px;">logout</i>Salir Ahora</a>
       </div>
       <div class="security-note-compact"><span class="pulse-dot"></span><span>Ser&aacute;s redirigido al inicio de sesi&oacute;n</span></div>
     </div>
@@ -61,7 +66,7 @@
 
 <%-- Scripts globales: Materialize JS, core del sistema y app personalizada --%>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-<script src="<%= ctx %>/js/core.js"></script>
-<script src="<%= ctx %>/js/app.js"></script>
+<script src="<%= _ctx %>/js/core.js"></script>
+<script src="<%= _ctx %>/js/app.js"></script>
 </body>
 </html>

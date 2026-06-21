@@ -3,7 +3,7 @@ package com.codewise.facturaexpress;
 import com.codewise.facturaexpress.controller.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.tomcat.TomcatWebServerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -67,8 +67,7 @@ public class FacturaexpressApplication {
 	 */
 	@Bean
 	public ServletRegistrationBean<LogoutServlet> logoutServlet() {
-		ServletRegistrationBean<LogoutServlet> bean = new ServletRegistrationBean<>(new LogoutServlet(), "/logout");
-		return bean;
+		return new ServletRegistrationBean<>(new LogoutServlet(), "/logout");
 	}
 
 	/**
@@ -101,12 +100,47 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	@Bean
+	public ServletRegistrationBean<ConfiguracionServlet> configuracionServlet() {
+		ServletRegistrationBean<ConfiguracionServlet> bean = new ServletRegistrationBean<>(new ConfiguracionServlet(), "/configuracion");
+		bean.setLoadOnStartup(1);
+		return bean;
+	}
+
+	@Bean
+	public ServletRegistrationBean<ErrorSistemaServlet> errorSistemaServlet() {
+		ServletRegistrationBean<ErrorSistemaServlet> bean = new ServletRegistrationBean<>(new ErrorSistemaServlet(), "/errores");
+		bean.setLoadOnStartup(1);
+		return bean;
+	}
+
+	@Bean
+	public ServletRegistrationBean<LogAuditoriaServlet> logAuditoriaServlet() {
+		ServletRegistrationBean<LogAuditoriaServlet> bean = new ServletRegistrationBean<>(new LogAuditoriaServlet(), "/logs");
+		bean.setLoadOnStartup(1);
+		return bean;
+	}
+
+	@Bean
+	public ServletRegistrationBean<UserAdminServlet> userAdminServlet() {
+		ServletRegistrationBean<UserAdminServlet> bean = new ServletRegistrationBean<>(new UserAdminServlet(), "/usuarios");
+		bean.setLoadOnStartup(1);
+		return bean;
+	}
+
+	@Bean
+	public ServletRegistrationBean<BackupRestoreServlet> backupRestoreServlet() {
+		ServletRegistrationBean<BackupRestoreServlet> bean = new ServletRegistrationBean<>(new BackupRestoreServlet(), "/backup");
+		bean.setLoadOnStartup(1);
+		return bean;
+	}
+
 	/**
 	 * Configura el contenedor Tomcat embebido para que sirva index.jsp
 	 * como welcome file en la ra&iacute;z (http://localhost:8080/).
 	 */
 	@Bean
-	public WebServerFactoryCustomizer<TomcatWebServerFactory> welcomePageCustomizer() {
+	public WebServerFactoryCustomizer<TomcatServletWebServerFactory> welcomePageCustomizer() {
 		return factory -> factory.addContextCustomizers(
 				context -> context.addWelcomeFile("index.jsp")
 		);

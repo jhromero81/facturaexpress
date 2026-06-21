@@ -24,6 +24,9 @@ public class LoginService {
         Optional<Usuario> usuarioOpt = usuarioDAO.buscarPorUsername(username.trim());
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
+            if (!usuario.isActivo()) {
+                return Optional.empty();
+            }
             if (passwordEncoder.matches(password, usuario.getPasswordHash())) {
                 return Optional.of(usuario);
             }
@@ -33,9 +36,5 @@ public class LoginService {
 
     public static String hashPassword(String rawPassword) {
         return new BCryptPasswordEncoder().encode(rawPassword);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(hashPassword("admin123"));
     }
 }

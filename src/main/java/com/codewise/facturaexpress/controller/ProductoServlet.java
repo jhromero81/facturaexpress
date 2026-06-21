@@ -2,6 +2,8 @@ package com.codewise.facturaexpress.controller;
 
 import com.codewise.facturaexpress.config.AuthUtil;
 import com.codewise.facturaexpress.model.Producto;
+import com.codewise.facturaexpress.model.Usuario;
+import com.codewise.facturaexpress.service.LogAuditoriaService;
 import com.codewise.facturaexpress.service.ProductoService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -16,10 +18,12 @@ import java.util.Optional;
 public class ProductoServlet extends HttpServlet {
 
     private ProductoService productoService;
+    private LogAuditoriaService logService;
 
     @Override
     public void init() {
         productoService = new ProductoService();
+        logService = new LogAuditoriaService();
     }
 
     @Override
@@ -119,15 +123,19 @@ public class ProductoServlet extends HttpServlet {
             }
             producto.setStock(Integer.parseInt(stockStr));
 
-            productoService.guardarProducto(producto);
+            Producto guardado = productoService.guardarProducto(producto);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "INSERT producto id=" + guardado.getId(), "productos", guardado.getId(), req);
             req.setAttribute("mensaje", "Producto registrado exitosamente");
             req.setAttribute("redirectUrl", req.getContextPath() + "/productos");
             req.getRequestDispatcher("/WEB-INF/jsp/confirmacion.jsp").forward(req, resp);
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Precio o stock invalido: deben ser numeros");
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al guardar producto: " + e.getMessage());
@@ -154,12 +162,16 @@ public class ProductoServlet extends HttpServlet {
             producto.setStock(Integer.parseInt(stockStr));
 
             productoService.actualizarProducto(producto);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "UPDATE producto id=" + producto.getId(), "productos", producto.getId(), req);
             resp.sendRedirect(req.getContextPath() + "/productos");
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Precio o stock invalido: deben ser numeros");
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al actualizar producto: " + e.getMessage());
@@ -172,6 +184,8 @@ public class ProductoServlet extends HttpServlet {
         try {
             Long id = Long.parseLong(req.getParameter("id"));
             productoService.eliminarProducto(id);
+            Usuario usuario = AuthUtil.getUsuario(req);
+            logService.registrar(usuario, "DELETE producto id=" + id, "productos", id, req);
             resp.sendRedirect(req.getContextPath() + "/productos");
         } catch (NumberFormatException e) {
             req.setAttribute("error", "ID de producto invalido");

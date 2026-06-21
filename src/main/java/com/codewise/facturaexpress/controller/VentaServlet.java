@@ -18,12 +18,14 @@ public class VentaServlet extends HttpServlet {
     private FacturaService facturaService;
     private ClienteService clienteService;
     private ProductoService productoService;
+    private LogAuditoriaService logService;
 
     @Override
     public void init() {
         facturaService = new FacturaService();
         clienteService = new ClienteService();
         productoService = new ProductoService();
+        logService = new LogAuditoriaService();
     }
 
     @Override
@@ -60,32 +62,13 @@ public class VentaServlet extends HttpServlet {
         }
         try {
             String action = req.getParameter("action");
-            if ("buscarCliente".equals(action)) {
-                String termino = req.getParameter("termino");
-                List<Cliente> resultados = clienteService.listarClientes();
-                List<Cliente> filtrados = new ArrayList<>();
-                if (termino != null && !termino.trim().isEmpty()) {
-                    for (Cliente c : resultados) {
-                        if (c.getNombre().toLowerCase().contains(termino.toLowerCase()) ||
-                            (c.getId().toString().equals(termino.trim()))) {
-                            filtrados.add(c);
-                        }
-                    }
-                }
-                req.setAttribute("clientes", filtrados.isEmpty() ? resultados : filtrados);
-                req.setAttribute("productos", productoService.listarProductos());
-                req.setAttribute("activeNav", "ventas");
-                req.setAttribute("pageTitle", "Punto de Venta");
-                req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
-                req.getRequestDispatcher("/WEB-INF/jsp/pos.jsp").forward(req, resp);
-                return;
-            }
-
             if ("finalizar".equals(action)) {
                 String clienteIdParam = req.getParameter("clienteId");
                 String[] productosId = req.getParameterValues("productoId");
                 String[] cantidades = req.getParameterValues("cantidad");
                 String[] precios = req.getParameterValues("precioUnitario");
+                String dtoParam = req.getParameter("descuentoPorcentaje");
+                int descuentoPorcentaje = (dtoParam != null && !dtoParam.isEmpty()) ? Integer.parseInt(dtoParam) : 0;
 
                 Factura factura = new Factura();
                 if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
@@ -108,7 +91,9 @@ public class VentaServlet extends HttpServlet {
                     detalles.add(detalle);
                 }
                 factura.setDetalles(detalles);
-                facturaService.crearFactura(factura);
+                Factura creada = facturaService.crearFactura(factura, descuentoPorcentaje);
+                Usuario usuario = AuthUtil.getUsuario(req);
+                logService.registrar(usuario, "INSERT venta factura id=" + creada.getId(), "facturas", creada.getId(), req);
 
                 req.setAttribute("mensaje", "Venta registrada exitosamente");
                 req.setAttribute("redirectUrl", req.getContextPath() + "/ventas");
@@ -119,18 +104,24 @@ public class VentaServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/ventas");
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Error en el formato de los numeros ingresados");
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             cargarDatos(req);
             req.setAttribute("activeNav", "ventas");
             req.setAttribute("pageTitle", "Punto de Venta");
             req.getRequestDispatcher("/WEB-INF/jsp/pos.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
+            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             cargarDatos(req);
             req.setAttribute("activeNav", "ventas");
             req.setAttribute("pageTitle", "Punto de Venta");
             req.getRequestDispatcher("/WEB-INF/jsp/pos.jsp").forward(req, resp);
         } catch (Exception e) {
-            req.setAttribute("error", "Error al procesar venta: " + e.getMessage());
+            StringBuilder sb = new StringBuilder("Error al procesar venta: ").append(e.getMessage());
+            for (Throwable c = e.getCause(); c != null; c = c.getCause()) {
+                sb.append(" | causa: ").append(c.getMessage());
+            }
+            req.setAttribute("error", sb.toString());
             req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
         }
     }
@@ -140,6 +131,7 @@ public class VentaServlet extends HttpServlet {
             req.setAttribute("clientes", clienteService.listarClientes());
             req.setAttribute("productos", productoService.listarProductos());
         } catch (Exception e) {
+            System.err.println("Error al cargar datos para POS: " + e.getMessage());
         }
     }
 }

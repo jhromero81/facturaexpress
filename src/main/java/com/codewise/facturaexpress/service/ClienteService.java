@@ -56,6 +56,12 @@ public class ClienteService {
         if (cliente.getId() == null) {
             throw new IllegalArgumentException("El ID del cliente es obligatorio para actualizar");
         }
+        if (cliente.getNombre() == null || cliente.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del cliente es obligatorio");
+        }
+        if (cliente.getEmail() != null && !cliente.getEmail().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Formato de email invalido");
+        }
         return clienteDAO.actualizar(cliente);
     }
 

@@ -33,6 +33,7 @@ public class DashboardServlet extends HttpServlet {
             req.setAttribute("ventasMes", reportesService.ventasDelMes());
             req.setAttribute("ventasSemana", reportesService.ventasSemana());
             req.setAttribute("topProductos", reportesService.topProductos(5));
+            req.setAttribute("ultimasTransacciones", reportesService.ultimasTransacciones(5));
             req.setAttribute("activeNav", "dashboard");
             req.setAttribute("pageTitle", "Dashboard");
             req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));

@@ -42,4 +42,13 @@ public class ReportesService {
 
     /** Retorna los N productos más vendidos. */
     public List<Map<String, Object>> topProductos(int limite) { return reportesDAO.topProductos(limite); }
+
+    /** Retorna las últimas N facturas para el dashboard. */
+    public List<Map<String, Object>> ultimasTransacciones(int limite) { return reportesDAO.ultimasTransacciones(limite); }
+
+    /** Retorna ventas agrupadas por trimestre (últimos 12 meses). */
+    public List<Map<String, Object>> ventasTrimestrales() { return reportesDAO.ventasTrimestrales(); }
+
+    /** Retorna ventas agrupadas por año (últimos 5 años). */
+    public List<Map<String, Object>> ventasAnuales() { return reportesDAO.ventasAnuales(); }
 }

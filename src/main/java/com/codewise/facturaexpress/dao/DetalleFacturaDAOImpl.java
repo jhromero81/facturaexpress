@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.dao;
 import com.codewise.facturaexpress.config.DatabaseConfig;
 import com.codewise.facturaexpress.model.DetalleFactura;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
     @Override
     public DetalleFactura guardar(DetalleFactura detalle) {
         // Inserta un nuevo detalle de factura y recupera el ID autogenerado
-        String sql = "INSERT INTO detalles_factura (factura_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO detalles_factura (factura_id, producto_id, cantidad, precio_unitario, subtotal, descuento) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setLong(1, detalle.getFacturaId());
@@ -31,6 +32,7 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
             stmt.setInt(3, detalle.getCantidad());
             stmt.setBigDecimal(4, detalle.getPrecioUnitario());
             stmt.setBigDecimal(5, detalle.getSubtotal());
+            stmt.setBigDecimal(6, detalle.getDescuento() != null ? detalle.getDescuento() : BigDecimal.ZERO);
             stmt.executeUpdate();
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -103,13 +105,14 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
     @Override
     public DetalleFactura actualizar(DetalleFactura detalle) {
         // Actualiza cantidad, precio unitario y subtotal de un detalle
-        String sql = "UPDATE detalles_factura SET cantidad = ?, precio_unitario = ?, subtotal = ? WHERE id = ?";
+        String sql = "UPDATE detalles_factura SET cantidad=?, precio_unitario=?, subtotal=?, descuento=? WHERE id=?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, detalle.getCantidad());
             stmt.setBigDecimal(2, detalle.getPrecioUnitario());
             stmt.setBigDecimal(3, detalle.getSubtotal());
-            stmt.setLong(4, detalle.getId());
+            stmt.setBigDecimal(4, detalle.getDescuento() != null ? detalle.getDescuento() : BigDecimal.ZERO);
+            stmt.setLong(5, detalle.getId());
             stmt.executeUpdate();
             return detalle;
         } catch (SQLException e) {
@@ -152,6 +155,8 @@ public class DetalleFacturaDAOImpl implements DetalleFacturaDAO {
         detalle.setPrecioUnitario(rs.getBigDecimal("precio_unitario"));
         detalle.setSubtotal(rs.getBigDecimal("subtotal"));
         detalle.setProductoNombre(rs.getString("producto_nombre"));
+        BigDecimal desc = rs.getBigDecimal("descuento");
+        detalle.setDescuento(desc != null ? desc : BigDecimal.ZERO);
         return detalle;
     }
 }

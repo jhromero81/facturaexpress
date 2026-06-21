@@ -4,7 +4,9 @@ import com.codewise.facturaexpress.config.DatabaseConfig;
 import com.codewise.facturaexpress.model.DetalleFactura;
 import com.codewise.facturaexpress.model.Factura;
 
+import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +23,8 @@ public class FacturaDAOImpl implements FacturaDAO {
 
     @Override
     public Factura guardar(Factura factura) {
-        String sqlCabecera = "INSERT INTO facturas (cliente_id, fecha, total, estado) VALUES (?, ?, ?, ?)";
-        String sqlDetalle = "INSERT INTO detalles_factura (factura_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
+        String sqlCabecera = "INSERT INTO facturas (cliente_id, usuario_id, fecha, total, estado, xml, pdf, cune, firma_estado, intentos_dian, correo_enviado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlDetalle = "INSERT INTO detalles_factura (factura_id, producto_id, cantidad, precio_unitario, subtotal, descuento) VALUES (?, ?, ?, ?, ?, ?)";
         Connection conn = null;
         try {
             conn = databaseConfig.getConnection();
@@ -30,9 +32,24 @@ public class FacturaDAOImpl implements FacturaDAO {
 
             try (PreparedStatement stmt = conn.prepareStatement(sqlCabecera, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setLong(1, factura.getClienteId());
-                stmt.setTimestamp(2, Timestamp.valueOf(factura.getFecha()));
-                stmt.setBigDecimal(3, factura.getTotal());
-                stmt.setString(4, factura.getEstado());
+                if (factura.getUsuarioId() != null) {
+                    stmt.setLong(2, factura.getUsuarioId());
+                } else {
+                    stmt.setNull(2, Types.BIGINT);
+                }
+                stmt.setTimestamp(3, Timestamp.valueOf(factura.getFecha()));
+                stmt.setBigDecimal(4, factura.getTotal());
+                stmt.setString(5, factura.getEstado());
+                stmt.setString(6, factura.getXml());
+                if (factura.getPdf() != null) {
+                    stmt.setBytes(7, factura.getPdf());
+                } else {
+                    stmt.setNull(7, Types.BLOB);
+                }
+                stmt.setString(8, factura.getCune());
+                stmt.setString(9, factura.getFirmaEstado() != null ? factura.getFirmaEstado() : "pendiente");
+                stmt.setInt(10, factura.getIntentosDian() != null ? factura.getIntentosDian() : 0);
+                stmt.setInt(11, factura.getCorreoEnviado() != null ? factura.getCorreoEnviado() : 0);
                 stmt.executeUpdate();
 
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -50,6 +67,7 @@ public class FacturaDAOImpl implements FacturaDAO {
                         stmt.setInt(3, detalle.getCantidad());
                         stmt.setBigDecimal(4, detalle.getPrecioUnitario());
                         stmt.setBigDecimal(5, detalle.getSubtotal());
+                        stmt.setBigDecimal(6, detalle.getDescuento() != null ? detalle.getDescuento() : BigDecimal.ZERO);
                         stmt.executeUpdate();
 
                         try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -79,7 +97,7 @@ public class FacturaDAOImpl implements FacturaDAO {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    throw new RuntimeException("Error al cerrar conexion", e);
+                    System.err.println("Error al cerrar conexion: " + e.getMessage());
                 }
             }
         }
@@ -118,20 +136,35 @@ public class FacturaDAOImpl implements FacturaDAO {
             }
             return facturas;
         } catch (SQLException e) {
-            throw new RuntimeException("Error al listar facturas", e);
+            throw new RuntimeException("Error al listar facturas: " + e.getMessage(), e);
         }
     }
 
     @Override
     public Factura actualizar(Factura factura) {
-        String sql = "UPDATE facturas SET cliente_id = ?, fecha = ?, total = ?, estado = ? WHERE id = ?";
+        String sql = "UPDATE facturas SET cliente_id=?, usuario_id=?, fecha=?, total=?, estado=?, xml=?, pdf=?, cune=?, firma_estado=?, intentos_dian=?, correo_enviado=? WHERE id=?";
         try (Connection conn = databaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, factura.getClienteId());
-            stmt.setTimestamp(2, Timestamp.valueOf(factura.getFecha()));
-            stmt.setBigDecimal(3, factura.getTotal());
-            stmt.setString(4, factura.getEstado());
-            stmt.setLong(5, factura.getId());
+            if (factura.getUsuarioId() != null) {
+                stmt.setLong(2, factura.getUsuarioId());
+            } else {
+                stmt.setNull(2, Types.BIGINT);
+            }
+            stmt.setTimestamp(3, Timestamp.valueOf(factura.getFecha()));
+            stmt.setBigDecimal(4, factura.getTotal());
+            stmt.setString(5, factura.getEstado());
+            stmt.setString(6, factura.getXml());
+            if (factura.getPdf() != null) {
+                stmt.setBytes(7, factura.getPdf());
+            } else {
+                stmt.setNull(7, Types.BLOB);
+            }
+            stmt.setString(8, factura.getCune());
+            stmt.setString(9, factura.getFirmaEstado() != null ? factura.getFirmaEstado() : "pendiente");
+            stmt.setInt(10, factura.getIntentosDian() != null ? factura.getIntentosDian() : 0);
+            stmt.setInt(11, factura.getCorreoEnviado() != null ? factura.getCorreoEnviado() : 0);
+            stmt.setLong(12, factura.getId());
             stmt.executeUpdate();
             return factura;
         } catch (SQLException e) {
@@ -172,7 +205,7 @@ public class FacturaDAOImpl implements FacturaDAO {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    throw new RuntimeException("Error al cerrar conexion", e);
+                    System.err.println("Error al cerrar conexion: " + e.getMessage());
                 }
             }
         }
@@ -182,9 +215,19 @@ public class FacturaDAOImpl implements FacturaDAO {
         Factura factura = new Factura();
         factura.setId(rs.getLong("id"));
         factura.setClienteId(rs.getLong("cliente_id"));
-        factura.setFecha(rs.getTimestamp("fecha").toLocalDateTime());
+        long uid = rs.getLong("usuario_id");
+        if (!rs.wasNull()) factura.setUsuarioId(uid);
+        Timestamp ts = rs.getTimestamp("fecha");
+        factura.setFecha(ts != null ? ts.toLocalDateTime() : LocalDateTime.now());
         factura.setTotal(rs.getBigDecimal("total"));
         factura.setEstado(rs.getString("estado"));
+        factura.setXml(rs.getString("xml"));
+        byte[] pdfBytes = rs.getBytes("pdf");
+        if (pdfBytes != null) factura.setPdf(pdfBytes);
+        factura.setCune(rs.getString("cune"));
+        factura.setFirmaEstado(rs.getString("firma_estado"));
+        factura.setIntentosDian(rs.getInt("intentos_dian"));
+        factura.setCorreoEnviado(rs.getInt("correo_enviado"));
         factura.setClienteNombre(rs.getString("cliente_nombre"));
         return factura;
     }

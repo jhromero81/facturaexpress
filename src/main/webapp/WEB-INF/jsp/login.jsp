@@ -1,6 +1,4 @@
-<%-- Página de inicio de sesión --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%-- Scriptlet: obtiene mensaje de error y contextPath desde el request --%>
 <%
   String error = (String) request.getAttribute("error");
   String ctx = request.getContextPath();
@@ -10,13 +8,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iniciar Sesi&oacute;n - FacturaExpress</title>
+  <title>FacturaExpress &ndash; Iniciar Sesi&oacute;n</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<%= ctx %>/css/styles.css">
   <script src="<%= ctx %>/js/accessibility-bootstrap.js"></script>
-<%-- Estilos específicos de la página de login --%>
   <style>
     body.fx-login-page { position: relative; }
     body.fx-login-page::before {
@@ -50,21 +47,19 @@
     .login-footer { text-align: center; margin-top: 20px; font-size: 12px; color: #90a4ae; }
     .login-footer a { color: var(--accent); cursor: pointer; }
     .dian-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(26,188,156,0.1); color: var(--accent); padding: 5px 14px; border-radius: 20px; margin-bottom: 24px; justify-content: center; width: auto; }
-    .error-msg { color: #e74c3c; font-size: 12px; margin-top: 8px; }
+    .error-msg { color: #e74c3c; font-size: 12px; margin-top: 8px; display: none; }
     .login-access-nav { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
-    .login-access-nav .btn-floating { background-color: #ffffff !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important; border: 1px solid #e0e0e0 !important; }
+    .login-access-nav .btn-floating { background-color: #ffffff !important; backdrop-filter: blur(5px) !important; -webkit-backdrop-filter: blur(5px) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important; border: 1px solid #e0e0e0 !important; }
     .login-access-nav .btn-floating i { color: #546e7a !important; }
     .login-access-nav .btn-floating:hover { background-color: var(--accent) !important; }
-    .credenciales-info { font-size: 12px; color: #90a4ae; border-top: 1px solid var(--border); margin-top: 24px; padding-top: 16px; }
   </style>
 </head>
 <body class="fx-login-page">
+<script>!function(){try{var p=JSON.parse(localStorage.getItem('facturaexpress_prefs'));if(p){document.documentElement.setAttribute('data-fx-dark-mode',p.modoOscuro?'true':'');document.documentElement.setAttribute('data-fx-high-contrast',p.altoContraste?'true':'');if(p.modoOscuro)document.body.classList.add('fx-dark-mode');if(p.altoContraste)document.body.classList.add('fx-high-contrast');var s={small:'12px',medium:'15px',large:'18px'};document.documentElement.style.fontSize=s[p.tamanoTexto]||'15px'}}catch(e){}}();</script>
 
-<%-- Contenedor central del login --%>
 <div class="login-wrapper">
   <div class="login-card">
 
-    <%-- Botones de accesibilidad: modo oscuro y alto contraste --%>
     <div class="login-access-nav">
       <a class="btn-floating btn-small waves-effect" id="loginDark" title="Modo Oscuro"><i class="material-icons">dark_mode</i></a>
       <a class="btn-floating btn-small waves-effect" id="loginContrast" title="Alto Contraste"><i class="material-icons">contrast</i></a>
@@ -80,14 +75,12 @@
       <span class="pulse-dot"></span> Servidor DIAN Activo
     </div>
 
-    <%-- Muestra error de autenticación si existe --%>
     <% if (error != null) { %>
-      <div class="error-msg" role="alert">
+      <p class="error-msg" role="alert" style="display:block;">
         <i class="material-icons" style="font-size:14px;vertical-align:middle;">error_outline</i> <%= error %>
-      </div>
+      </p>
     <% } %>
 
-<%-- Formulario de login: envía credenciales vía POST a /login --%>
     <form action="<%= ctx %>/login" method="post">
       <div class="input-field">
         <i class="material-icons prefix">person</i>
@@ -107,17 +100,11 @@
       </button>
     </form>
 
-    <%-- Enlaces de ayuda al usuario --%>
     <div class="login-footer">
-      ¿Olvidaste tu contrase&ntilde;a? <a>Recuperar acceso</a><br><br>
-      ¿Problemas de acceso? <a>Contacte al administrador</a>
+      &iquest;Olvidaste tu contrase&ntilde;a? <a>Recuperar acceso</a><br><br>
+      &iquest;Problemas de acceso? <a>Contacte al administrador</a>
     </div>
 
-    <%-- Credenciales de prueba para desarrollo --%>
-    <div class="credenciales-info">
-      <strong>Credenciales de prueba:</strong><br>
-      admin / admin123 &nbsp;|&nbsp; vendedor / admin123 &nbsp;|&nbsp; contador / admin123
-    </div>
   </div>
 </div>
 
@@ -125,7 +112,9 @@
 <script src="<%= ctx %>/js/core.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Toggle mostrar/ocultar contraseña
+  if (window.FacturaExpress && FacturaExpress.accessibility) {
+    FacturaExpress.accessibility.applyAll();
+  }
   var togglePass = document.getElementById('togglePassword');
   var passEl = document.getElementById('loginPass');
   if (togglePass && passEl) {
@@ -135,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function() {
       togglePass.textContent = isPass ? 'visibility_off' : 'visibility';
     });
   }
-  // Botones de accesibilidad: modo oscuro y alto contraste
   var loginDark = document.getElementById('loginDark');
   var loginContrast = document.getElementById('loginContrast');
   if (loginDark) {

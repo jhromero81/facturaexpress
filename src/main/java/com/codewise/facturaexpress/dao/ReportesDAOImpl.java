@@ -148,4 +148,71 @@ public class ReportesDAOImpl implements ReportesDAO {
         }
         return result;
     }
+
+    @Override
+    public List<Map<String, Object>> ventasTrimestrales() {
+        String sql = "SELECT CONCAT(YEAR(fecha), '-Q', QUARTER(fecha)) AS trimestre, COALESCE(SUM(total), 0) AS total " +
+                     "FROM facturas WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) " +
+                     "GROUP BY CONCAT(YEAR(fecha), '-Q', QUARTER(fecha)) ORDER BY MIN(fecha)";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("periodo", rs.getString("trimestre"));
+                row.put("total", rs.getBigDecimal("total"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al consultar ventas trimestrales", e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Map<String, Object>> ventasAnuales() {
+        String sql = "SELECT YEAR(fecha) AS anio, COALESCE(SUM(total), 0) AS total " +
+                     "FROM facturas WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 5 YEAR) " +
+                     "GROUP BY YEAR(fecha) ORDER BY MIN(fecha)";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("periodo", rs.getString("anio"));
+                row.put("total", rs.getBigDecimal("total"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al consultar ventas anuales", e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Map<String, Object>> ultimasTransacciones(int limite) {
+        String sql = "SELECT f.id, f.total, f.fecha, c.nombre AS cliente_nombre " +
+                     "FROM facturas f LEFT JOIN clientes c ON f.cliente_id = c.id " +
+                     "ORDER BY f.fecha DESC LIMIT ?";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limite);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("id", rs.getLong("id"));
+                    row.put("total", rs.getBigDecimal("total"));
+                    row.put("fecha", rs.getTimestamp("fecha") != null ? rs.getTimestamp("fecha").toString() : "");
+                    row.put("cliente_nombre", rs.getString("cliente_nombre"));
+                    result.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al consultar ultimas transacciones", e);
+        }
+        return result;
+    }
 }

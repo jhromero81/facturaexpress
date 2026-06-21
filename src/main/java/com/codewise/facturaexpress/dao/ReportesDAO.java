@@ -19,6 +19,13 @@ public interface ReportesDAO {
     List<Map<String, Object>> ventasSemana();
     /** Retorna las ventas agrupadas por mes de los últimos 6 meses. */
     List<Map<String, Object>> ventasMensuales();
+    /** Retorna las ventas agrupadas por trimestre (12 meses agrupados). */
+    List<Map<String, Object>> ventasTrimestrales();
+    /** Retorna las ventas agrupadas por año (últimos 5 años). */
+    List<Map<String, Object>> ventasAnuales();
     /** Retorna los N productos más vendidos por cantidad. */
     List<Map<String, Object>> topProductos(int limite);
+
+    /** Retorna las últimas N facturas con datos de cliente para el dashboard. */
+    List<Map<String, Object>> ultimasTransacciones(int limite);
 }

@@ -88,7 +88,8 @@ function calcularSubtotal(row) {
   const cantidad = parseFloat(row.querySelector('input[name="cantidad"]').value) || 0;
   const precio = parseFloat(row.querySelector('input[name="precioUnitario"]').value) || 0;
   const subtotal = cantidad * precio;
-  row.querySelector('.subtotal-cell').textContent = '$' + subtotal.toLocaleString('es-CO');
+  const cell = row.querySelector('.subtotal-cell');
+  if (cell) cell.textContent = '$' + subtotal.toLocaleString('es-CO');
   calcularTotal();
 }
 
