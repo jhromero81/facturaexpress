@@ -86,4 +86,5 @@ function filtrarClientes(valor) {
 }
 </script>
 
+<script src="<%= ctx %>/js/clientes.js"></script>
 <%@ include file="/WEB-INF/jsp/layout/footer.jsp" %>
