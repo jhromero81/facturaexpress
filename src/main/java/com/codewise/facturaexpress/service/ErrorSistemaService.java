@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.service;
 import com.codewise.facturaexpress.model.ErrorSistema;
 import com.codewise.facturaexpress.repository.ErrorSistemaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ErrorSistemaService {
         this.errorRepository = errorRepository;
     }
 
+    @Transactional
     public ErrorSistema registrarError(String mensaje, String tipo, Long facturaId) {
         ErrorSistema error = new ErrorSistema();
         error.setMensaje(mensaje);

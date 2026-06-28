@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.service;
 import com.codewise.facturaexpress.model.Producto;
 import com.codewise.facturaexpress.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ProductoService {
         this.productoRepository = productoRepository;
     }
 
+    @Transactional
     public Producto guardarProducto(Producto producto) {
         if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del producto es obligatorio");
@@ -41,6 +43,7 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+    @Transactional
     public Producto actualizarProducto(Producto producto) {
         if (producto.getId() == null) {
             throw new IllegalArgumentException("El ID del producto es obligatorio para actualizar");
@@ -57,6 +60,7 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
+    @Transactional
     public void eliminarProducto(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de producto invalido");
@@ -64,6 +68,7 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
 
+    @Transactional
     public void descontarStock(Long productoId, int cantidad) {
         int updated = productoRepository.descontarStock(productoId, cantidad);
         if (updated == 0) {

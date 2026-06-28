@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.service;
 import com.codewise.facturaexpress.model.Cliente;
 import com.codewise.facturaexpress.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ public class ClienteService {
         this.clienteRepository = clienteRepository;
     }
 
+    @Transactional
     public Cliente guardarCliente(Cliente cliente) {
         if (cliente.getNombre() == null || cliente.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del cliente es obligatorio");
@@ -37,6 +39,7 @@ public class ClienteService {
         return clienteRepository.findAll();
     }
 
+    @Transactional
     public Cliente actualizarCliente(Cliente cliente) {
         if (cliente.getId() == null) {
             throw new IllegalArgumentException("El ID del cliente es obligatorio para actualizar");
@@ -50,6 +53,7 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    @Transactional
     public void eliminarCliente(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de cliente invalido");

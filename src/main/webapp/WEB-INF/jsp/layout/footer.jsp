@@ -23,7 +23,7 @@
     <%-- Cabecera del modal de logout --%>
     <div class="logout-header">
       <div class="logout-icon"><i class="material-icons">exit_to_app</i></div>
-      <h4>¿Cerrar sesi&oacute;n?</h4>
+      <h4>&iquest;Cerrar sesi&oacute;n?</h4>
       <p>Est&aacute;s a punto de salir del sistema</p>
     </div>
     <div class="logout-body">

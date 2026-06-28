@@ -4,6 +4,7 @@ import com.codewise.facturaexpress.model.Usuario;
 import com.codewise.facturaexpress.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class UsuarioAdminService {
         return usuarioRepository.findById(id);
     }
 
+    @Transactional
     public Usuario crearUsuario(Usuario usuario, String passwordPlano) {
         if (usuario.getUsername() == null || usuario.getUsername().isBlank()) {
             throw new IllegalArgumentException("El username es obligatorio");
@@ -42,6 +44,7 @@ public class UsuarioAdminService {
         return usuarioRepository.save(usuario);
     }
 
+    @Transactional
     public Usuario actualizarUsuario(Usuario usuario) {
         if (usuario.getId() == null) {
             throw new IllegalArgumentException("ID requerido para actualizar");
@@ -55,6 +58,7 @@ public class UsuarioAdminService {
         return usuarioRepository.save(existente);
     }
 
+    @Transactional
     public void cambiarPassword(Long id, String nuevaPassword) {
         if (nuevaPassword == null || nuevaPassword.length() < 4) {
             throw new IllegalArgumentException("La contraseña debe tener al menos 4 caracteres");
@@ -65,6 +69,7 @@ public class UsuarioAdminService {
         usuarioRepository.save(usr);
     }
 
+    @Transactional
     public void activarODesactivar(Long id, boolean activo) {
         Usuario usr = usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
@@ -72,6 +77,7 @@ public class UsuarioAdminService {
         usuarioRepository.save(usr);
     }
 
+    @Transactional
     public void eliminarUsuario(Long id) {
         usuarioRepository.deleteById(id);
     }

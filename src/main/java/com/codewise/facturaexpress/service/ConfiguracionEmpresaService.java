@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.service;
 import com.codewise.facturaexpress.model.ConfiguracionEmpresa;
 import com.codewise.facturaexpress.repository.ConfiguracionEmpresaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ public class ConfiguracionEmpresaService {
         return opt.orElse(null);
     }
 
+    @Transactional
     public ConfiguracionEmpresa guardarConfiguracion(ConfiguracionEmpresa config) {
         Optional<ConfiguracionEmpresa> existente = configRepository.findFirstByOrderByIdAsc();
         if (existente.isPresent()) {

@@ -5,6 +5,7 @@ import com.codewise.facturaexpress.model.Usuario;
 import com.codewise.facturaexpress.repository.LogAuditoriaRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,7 +18,9 @@ public class LogAuditoriaService {
         this.logRepository = logRepository;
     }
 
+    @Transactional
     public void registrar(Usuario usuario, String accion, String tabla, Long registroId, HttpServletRequest request) {
+        if (usuario == null) { registrar(null, accion, tabla, registroId, obtenerIp(request)); return; }
         LogAuditoria log = new LogAuditoria();
         log.setUsuarioId(usuario.getId());
         log.setAccion(accion);
@@ -27,6 +30,7 @@ public class LogAuditoriaService {
         logRepository.save(log);
     }
 
+    @Transactional
     public void registrar(Long usuarioId, String accion, String tabla, Long registroId, String ip) {
         LogAuditoria log = new LogAuditoria();
         log.setUsuarioId(usuarioId);

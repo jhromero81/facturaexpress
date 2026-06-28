@@ -147,6 +147,8 @@ public class FacturaService {
         }
         Optional<Factura> facturaOpt = facturaRepository.findByIdWithClienteNombre(id);
         facturaOpt.ifPresent(f -> {
+            clienteRepository.findById(f.getClienteId())
+                .ifPresent(c -> f.setClienteNombre(c.getNombre()));
             List<DetalleFactura> detalles = detalleFacturaRepository.findByFacturaIdWithProductoNombre(f.getId());
             f.setDetalles(detalles);
         });
@@ -156,12 +158,15 @@ public class FacturaService {
     public List<Factura> listarFacturas() {
         List<Factura> facturas = facturaRepository.findAllWithClienteNombre();
         for (Factura f : facturas) {
+            clienteRepository.findById(f.getClienteId())
+                .ifPresent(c -> f.setClienteNombre(c.getNombre()));
             List<DetalleFactura> detalles = detalleFacturaRepository.findByFacturaIdWithProductoNombre(f.getId());
             f.setDetalles(detalles);
         }
         return facturas;
     }
 
+    @Transactional
     public void actualizarEstado(Long id, String nuevoEstado) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de factura invalido");

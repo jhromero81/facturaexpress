@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.service;
 import com.codewise.facturaexpress.model.Reporte;
 import com.codewise.facturaexpress.repository.ReporteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ReporteService {
         this.reporteRepository = reporteRepository;
     }
 
+    @Transactional
     public Reporte generarReporte(String tipo, LocalDate inicio, LocalDate fin, Long usuarioId) {
         Reporte reporte = new Reporte();
         reporte.setTipo(tipo);
@@ -39,6 +41,7 @@ public class ReporteService {
         return reporteRepository.findById(id);
     }
 
+    @Transactional
     public void eliminarReporte(Long id) {
         reporteRepository.deleteById(id);
     }

@@ -38,6 +38,7 @@ public class ConfiguracionEmpresa {
     @Column(name = "alertas_dian")
     private boolean alertasDian;
 
+    @Column(name = "recordatorios")
     private boolean recordatorios;
 
     private LocalDateTime actualizada;
