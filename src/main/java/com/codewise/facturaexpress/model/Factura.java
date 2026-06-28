@@ -1,25 +1,55 @@
 package com.codewise.facturaexpress.model;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "facturas")
 public class Factura {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "cliente_id", nullable = false)
     private Long clienteId;
+
+    @Transient
     private String clienteNombre;
+
+    @Column(name = "usuario_id")
     private Long usuarioId;
+
+    @Column(nullable = false)
     private LocalDateTime fecha;
+
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal total;
+
+    @Column(nullable = false)
     private String estado;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String xml;
+
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] pdf;
+
     private String cune;
+
+    @Column(name = "firma_estado")
     private String firmaEstado;
+
+    @Column(name = "intentos_dian")
     private Integer intentosDian;
-    private Integer correoEnviado;
+
+    @Column(name = "correo_enviado", nullable = false)
+    private boolean correoEnviado;
+
+    @Transient
     private List<DetalleFactura> detalles;
 
     public Factura() {
@@ -28,7 +58,7 @@ public class Factura {
         this.estado = "PENDIENTE";
         this.firmaEstado = "pendiente";
         this.intentosDian = 0;
-        this.correoEnviado = 0;
+        this.correoEnviado = false;
         this.total = BigDecimal.ZERO;
     }
 
@@ -56,8 +86,8 @@ public class Factura {
     public void setFirmaEstado(String firmaEstado) { this.firmaEstado = firmaEstado; }
     public Integer getIntentosDian() { return intentosDian; }
     public void setIntentosDian(Integer intentosDian) { this.intentosDian = intentosDian; }
-    public Integer getCorreoEnviado() { return correoEnviado; }
-    public void setCorreoEnviado(Integer correoEnviado) { this.correoEnviado = correoEnviado; }
+    public boolean isCorreoEnviado() { return correoEnviado; }
+    public void setCorreoEnviado(boolean correoEnviado) { this.correoEnviado = correoEnviado; }
     public List<DetalleFactura> getDetalles() { return detalles; }
     public void setDetalles(List<DetalleFactura> detalles) { this.detalles = detalles; }
 

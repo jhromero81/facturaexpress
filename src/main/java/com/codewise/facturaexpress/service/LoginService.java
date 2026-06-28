@@ -1,19 +1,20 @@
 package com.codewise.facturaexpress.service;
 
-import com.codewise.facturaexpress.dao.UsuarioDAO;
-import com.codewise.facturaexpress.dao.UsuarioDAOImpl;
 import com.codewise.facturaexpress.model.Usuario;
+import com.codewise.facturaexpress.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class LoginService {
 
-    private final UsuarioDAO usuarioDAO;
+    private final UsuarioRepository usuarioRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public LoginService() {
-        this.usuarioDAO = new UsuarioDAOImpl();
+    public LoginService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -21,7 +22,7 @@ public class LoginService {
         if (username == null || username.trim().isEmpty() || password == null || password.isEmpty()) {
             return Optional.empty();
         }
-        Optional<Usuario> usuarioOpt = usuarioDAO.buscarPorUsername(username.trim());
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username.trim());
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
             if (!usuario.isActivo()) {

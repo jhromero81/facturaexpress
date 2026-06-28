@@ -1,34 +1,47 @@
 package com.codewise.facturaexpress.service;
 
-import com.codewise.facturaexpress.dao.*;
 import com.codewise.facturaexpress.model.*;
+import com.codewise.facturaexpress.repository.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class FacturaService {
 
-    private final FacturaDAO facturaDAO;
-    private final ProductoDAO productoDAO;
-    private final ClienteDAO clienteDAO;
+    private final FacturaRepository facturaRepository;
+    private final DetalleFacturaRepository detalleFacturaRepository;
+    private final ProductoRepository productoRepository;
+    private final ClienteRepository clienteRepository;
     private final XmlService xmlService;
     private final PdfService pdfService;
     private final EmailService emailService;
 
-    public FacturaService() {
-        this.facturaDAO = new FacturaDAOImpl();
-        this.productoDAO = new ProductoDAOImpl();
-        this.clienteDAO = new ClienteDAOImpl();
-        this.xmlService = new XmlService();
-        this.pdfService = new PdfService();
-        this.emailService = new EmailService();
+    public FacturaService(FacturaRepository facturaRepository,
+                          DetalleFacturaRepository detalleFacturaRepository,
+                          ProductoRepository productoRepository,
+                          ClienteRepository clienteRepository,
+                          XmlService xmlService,
+                          PdfService pdfService,
+                          EmailService emailService) {
+        this.facturaRepository = facturaRepository;
+        this.detalleFacturaRepository = detalleFacturaRepository;
+        this.productoRepository = productoRepository;
+        this.clienteRepository = clienteRepository;
+        this.xmlService = xmlService;
+        this.pdfService = pdfService;
+        this.emailService = emailService;
     }
 
+    @Transactional
     public Factura crearFactura(Factura factura) {
         return crearFactura(factura, 0);
     }
 
+    @Transactional
     public Factura crearFactura(Factura factura, int descuentoPorcentaje) {
         if (factura.getClienteId() == null) {
             throw new IllegalArgumentException("El ID del cliente es obligatorio");
@@ -56,7 +69,7 @@ public class FacturaService {
                 detalle.setDescuento(BigDecimal.ZERO);
             }
 
-            Optional<Producto> productoOpt = productoDAO.buscarPorId(detalle.getProductoId());
+            Optional<Producto> productoOpt = productoRepository.findById(detalle.getProductoId());
             if (productoOpt.isEmpty()) {
                 throw new IllegalArgumentException("Producto no encontrado con id: " + detalle.getProductoId());
             }
@@ -74,20 +87,18 @@ public class FacturaService {
         BigDecimal total = base.add(iva);
         factura.setTotal(total);
         factura.setEstado("PENDIENTE");
-        Factura creada = facturaDAO.guardar(factura);
 
-        try {
-            for (DetalleFactura detalle : factura.getDetalles()) {
-                productoDAO.descontarStock(detalle.getProductoId(), detalle.getCantidad());
-            }
-        } catch (Exception e) {
-            facturaDAO.eliminar(creada.getId());
-            throw new RuntimeException("Error al descontar stock, factura anulada: " + e.getMessage(), e);
+        Factura creada = facturaRepository.save(factura);
+
+        for (DetalleFactura detalle : factura.getDetalles()) {
+            detalle.setFacturaId(creada.getId());
+            detalleFacturaRepository.save(detalle);
+            productoRepository.descontarStock(detalle.getProductoId(), detalle.getCantidad());
         }
 
         generarDocumentos(creada);
 
-        return facturaDAO.buscarPorId(creada.getId()).orElse(creada);
+        return buscarPorId(creada.getId()).orElse(creada);
     }
 
     public void generarDocumentos(Factura factura) {
@@ -105,10 +116,10 @@ public class FacturaService {
             System.err.println("Error al generar PDF para factura " + factura.getId() + ": " + e.getMessage());
         }
 
-        facturaDAO.actualizar(factura);
+        facturaRepository.save(factura);
 
         try {
-            Optional<Cliente> clienteOpt = clienteDAO.buscarPorId(factura.getClienteId());
+            Optional<Cliente> clienteOpt = clienteRepository.findById(factura.getClienteId());
             if (clienteOpt.isPresent()) {
                 Cliente cliente = clienteOpt.get();
                 if (cliente.getEmail() != null && !cliente.getEmail().isBlank()) {
@@ -120,8 +131,8 @@ public class FacturaService {
                         "factura_" + factura.getId() + ".pdf"
                     );
                     if (enviado) {
-                        factura.setCorreoEnviado(1);
-                        facturaDAO.actualizar(factura);
+                        factura.setCorreoEnviado(true);
+                        facturaRepository.save(factura);
                     }
                 }
             }
@@ -134,11 +145,21 @@ public class FacturaService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de factura invalido");
         }
-        return facturaDAO.buscarPorId(id);
+        Optional<Factura> facturaOpt = facturaRepository.findByIdWithClienteNombre(id);
+        facturaOpt.ifPresent(f -> {
+            List<DetalleFactura> detalles = detalleFacturaRepository.findByFacturaIdWithProductoNombre(f.getId());
+            f.setDetalles(detalles);
+        });
+        return facturaOpt;
     }
 
     public List<Factura> listarFacturas() {
-        return facturaDAO.listarTodos();
+        List<Factura> facturas = facturaRepository.findAllWithClienteNombre();
+        for (Factura f : facturas) {
+            List<DetalleFactura> detalles = detalleFacturaRepository.findByFacturaIdWithProductoNombre(f.getId());
+            f.setDetalles(detalles);
+        }
+        return facturas;
     }
 
     public void actualizarEstado(Long id, String nuevoEstado) {
@@ -148,16 +169,18 @@ public class FacturaService {
         if (nuevoEstado == null || nuevoEstado.trim().isEmpty()) {
             throw new IllegalArgumentException("El estado es obligatorio");
         }
-        Factura factura = facturaDAO.buscarPorId(id)
+        Factura factura = facturaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Factura no encontrada con id: " + id));
         factura.setEstado(nuevoEstado.toUpperCase());
-        facturaDAO.actualizar(factura);
+        facturaRepository.save(factura);
     }
 
+    @Transactional
     public void eliminarFactura(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de factura invalido");
         }
-        facturaDAO.eliminar(id);
+        detalleFacturaRepository.deleteByFacturaId(id);
+        facturaRepository.deleteById(id);
     }
 }

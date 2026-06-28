@@ -1,6 +1,7 @@
 package com.codewise.facturaexpress;
 
 import com.codewise.facturaexpress.controller.*;
+import com.codewise.facturaexpress.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -8,137 +9,124 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
-/**
- * Punto de entrada principal. Arranca Spring Boot y registra los
- * servlets Jakarta EE como beans para el manejo de peticiones HTTP.
- */
 @SpringBootApplication
 public class FacturaexpressApplication {
 
-	/**
-	 * Inicia la aplicación Spring Boot embebida.
-	 */
 	public static void main(String[] args) {
 		SpringApplication.run(FacturaexpressApplication.class, args);
 	}
 
-	/**
-	 * Registra el servlet de clientes en la ruta /clientes.
-	 */
 	@Bean
-	public ServletRegistrationBean<ClienteServlet> clienteServlet() {
-		ServletRegistrationBean<ClienteServlet> bean = new ServletRegistrationBean<>(new ClienteServlet(), "/clientes");
+	public ServletRegistrationBean<ClienteServlet> clienteServlet(
+			ClienteService clienteService, LogAuditoriaService logService) {
+		ServletRegistrationBean<ClienteServlet> bean =
+				new ServletRegistrationBean<>(new ClienteServlet(clienteService, logService), "/clientes");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
-	/**
-	 * Registra el servlet de productos en la ruta /productos.
-	 */
 	@Bean
-	public ServletRegistrationBean<ProductoServlet> productoServlet() {
-		ServletRegistrationBean<ProductoServlet> bean = new ServletRegistrationBean<>(new ProductoServlet(), "/productos");
+	public ServletRegistrationBean<ProductoServlet> productoServlet(
+			ProductoService productoService, LogAuditoriaService logService) {
+		ServletRegistrationBean<ProductoServlet> bean =
+				new ServletRegistrationBean<>(new ProductoServlet(productoService, logService), "/productos");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
-	/**
-	 * Registra el servlet de facturas en la ruta /facturas.
-	 */
 	@Bean
-	public ServletRegistrationBean<FacturaServlet> facturaServlet() {
-		ServletRegistrationBean<FacturaServlet> bean = new ServletRegistrationBean<>(new FacturaServlet(), "/facturas");
+	public ServletRegistrationBean<FacturaServlet> facturaServlet(
+			FacturaService facturaService, ClienteService clienteService,
+			ProductoService productoService, LogAuditoriaService logService) {
+		ServletRegistrationBean<FacturaServlet> bean =
+				new ServletRegistrationBean<>(new FacturaServlet(facturaService, clienteService, productoService, logService), "/facturas");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
-	/**
-	 * Registra el servlet de login en la ruta /login.
-	 */
 	@Bean
-	public ServletRegistrationBean<LoginServlet> loginServlet() {
-		ServletRegistrationBean<LoginServlet> bean = new ServletRegistrationBean<>(new LoginServlet(), "/login");
+	public ServletRegistrationBean<LoginServlet> loginServlet(LoginService loginService) {
+		ServletRegistrationBean<LoginServlet> bean =
+				new ServletRegistrationBean<>(new LoginServlet(loginService), "/login");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
-	/**
-	 * Registra el servlet de logout en la ruta /logout.
-	 */
 	@Bean
 	public ServletRegistrationBean<LogoutServlet> logoutServlet() {
 		return new ServletRegistrationBean<>(new LogoutServlet(), "/logout");
 	}
 
-	/**
-	 * Registra el servlet del dashboard en la ruta /dashboard.
-	 */
 	@Bean
-	public ServletRegistrationBean<DashboardServlet> dashboardServlet() {
-		ServletRegistrationBean<DashboardServlet> bean = new ServletRegistrationBean<>(new DashboardServlet(), "/dashboard");
-		bean.setLoadOnStartup(1);
-		return bean;
-	}
-
-	/**
-	 * Registra el servlet de ventas en la ruta /ventas.
-	 */
-	@Bean
-	public ServletRegistrationBean<VentaServlet> ventaServlet() {
-		ServletRegistrationBean<VentaServlet> bean = new ServletRegistrationBean<>(new VentaServlet(), "/ventas");
-		bean.setLoadOnStartup(1);
-		return bean;
-	}
-
-	/**
-	 * Registra el servlet de reportes en la ruta /reportes.
-	 */
-	@Bean
-	public ServletRegistrationBean<ReportesServlet> reportesServlet() {
-		ServletRegistrationBean<ReportesServlet> bean = new ServletRegistrationBean<>(new ReportesServlet(), "/reportes");
+	public ServletRegistrationBean<DashboardServlet> dashboardServlet(ReportesService reportesService) {
+		ServletRegistrationBean<DashboardServlet> bean =
+				new ServletRegistrationBean<>(new DashboardServlet(reportesService), "/dashboard");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
 	@Bean
-	public ServletRegistrationBean<ConfiguracionServlet> configuracionServlet() {
-		ServletRegistrationBean<ConfiguracionServlet> bean = new ServletRegistrationBean<>(new ConfiguracionServlet(), "/configuracion");
+	public ServletRegistrationBean<VentaServlet> ventaServlet(
+			FacturaService facturaService, ClienteService clienteService,
+			ProductoService productoService, LogAuditoriaService logService) {
+		ServletRegistrationBean<VentaServlet> bean =
+				new ServletRegistrationBean<>(new VentaServlet(facturaService, clienteService, productoService, logService), "/ventas");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
 	@Bean
-	public ServletRegistrationBean<ErrorSistemaServlet> errorSistemaServlet() {
-		ServletRegistrationBean<ErrorSistemaServlet> bean = new ServletRegistrationBean<>(new ErrorSistemaServlet(), "/errores");
+	public ServletRegistrationBean<ReportesServlet> reportesServlet(
+			ReportesService reportesService, ReporteService reporteService, PdfService pdfService) {
+		ServletRegistrationBean<ReportesServlet> bean =
+				new ServletRegistrationBean<>(new ReportesServlet(reportesService, reporteService, pdfService), "/reportes");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
 	@Bean
-	public ServletRegistrationBean<LogAuditoriaServlet> logAuditoriaServlet() {
-		ServletRegistrationBean<LogAuditoriaServlet> bean = new ServletRegistrationBean<>(new LogAuditoriaServlet(), "/logs");
+	public ServletRegistrationBean<ConfiguracionServlet> configuracionServlet(
+			ConfiguracionEmpresaService configService, LogAuditoriaService logService) {
+		ServletRegistrationBean<ConfiguracionServlet> bean =
+				new ServletRegistrationBean<>(new ConfiguracionServlet(configService, logService), "/configuracion");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
 	@Bean
-	public ServletRegistrationBean<UserAdminServlet> userAdminServlet() {
-		ServletRegistrationBean<UserAdminServlet> bean = new ServletRegistrationBean<>(new UserAdminServlet(), "/usuarios");
+	public ServletRegistrationBean<ErrorSistemaServlet> errorSistemaServlet(
+			ErrorSistemaService errorService, LogAuditoriaService logService) {
+		ServletRegistrationBean<ErrorSistemaServlet> bean =
+				new ServletRegistrationBean<>(new ErrorSistemaServlet(errorService, logService), "/errores");
+		bean.setLoadOnStartup(1);
+		return bean;
+	}
+
+	@Bean
+	public ServletRegistrationBean<LogAuditoriaServlet> logAuditoriaServlet(LogAuditoriaService logService) {
+		ServletRegistrationBean<LogAuditoriaServlet> bean =
+				new ServletRegistrationBean<>(new LogAuditoriaServlet(logService), "/logs");
+		bean.setLoadOnStartup(1);
+		return bean;
+	}
+
+	@Bean
+	public ServletRegistrationBean<UserAdminServlet> userAdminServlet(
+			UsuarioAdminService usuarioAdminService, LogAuditoriaService logService) {
+		ServletRegistrationBean<UserAdminServlet> bean =
+				new ServletRegistrationBean<>(new UserAdminServlet(usuarioAdminService, logService), "/usuarios");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
 	@Bean
 	public ServletRegistrationBean<BackupRestoreServlet> backupRestoreServlet() {
-		ServletRegistrationBean<BackupRestoreServlet> bean = new ServletRegistrationBean<>(new BackupRestoreServlet(), "/backup");
+		ServletRegistrationBean<BackupRestoreServlet> bean =
+				new ServletRegistrationBean<>(new BackupRestoreServlet(), "/backup");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}
 
-	/**
-	 * Configura el contenedor Tomcat embebido para que sirva index.jsp
-	 * como welcome file en la ra&iacute;z (http://localhost:8080/).
-	 */
 	@Bean
 	public WebServerFactoryCustomizer<TomcatServletWebServerFactory> welcomePageCustomizer() {
 		return factory -> factory.addContextCustomizers(

@@ -17,13 +17,12 @@ import java.util.Optional;
 
 public class ProductoServlet extends HttpServlet {
 
-    private ProductoService productoService;
-    private LogAuditoriaService logService;
+    private final ProductoService productoService;
+    private final LogAuditoriaService logService;
 
-    @Override
-    public void init() {
-        productoService = new ProductoService();
-        logService = new LogAuditoriaService();
+    public ProductoServlet(ProductoService productoService, LogAuditoriaService logService) {
+        this.productoService = productoService;
+        this.logService = logService;
     }
 
     @Override

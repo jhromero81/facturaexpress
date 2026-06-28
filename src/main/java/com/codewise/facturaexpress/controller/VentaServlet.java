@@ -15,17 +15,17 @@ import java.util.List;
 
 public class VentaServlet extends HttpServlet {
 
-    private FacturaService facturaService;
-    private ClienteService clienteService;
-    private ProductoService productoService;
-    private LogAuditoriaService logService;
+    private final FacturaService facturaService;
+    private final ClienteService clienteService;
+    private final ProductoService productoService;
+    private final LogAuditoriaService logService;
 
-    @Override
-    public void init() {
-        facturaService = new FacturaService();
-        clienteService = new ClienteService();
-        productoService = new ProductoService();
-        logService = new LogAuditoriaService();
+    public VentaServlet(FacturaService facturaService, ClienteService clienteService,
+                        ProductoService productoService, LogAuditoriaService logService) {
+        this.facturaService = facturaService;
+        this.clienteService = clienteService;
+        this.productoService = productoService;
+        this.logService = logService;
     }
 
     @Override
