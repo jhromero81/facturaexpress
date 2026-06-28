@@ -1,16 +1,35 @@
 package com.codewise.facturaexpress.model;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "detalles_factura")
 public class DetalleFactura {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "factura_id", nullable = false)
     private Long facturaId;
+
+    @Column(name = "producto_id", nullable = false)
     private Long productoId;
+
+    @Transient
     private String productoNombre;
+
+    @Column(nullable = false)
     private Integer cantidad;
+
+    @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
+
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
+
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal descuento;
 
     public DetalleFactura() {

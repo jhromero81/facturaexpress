@@ -11,11 +11,10 @@ import java.io.IOException;
 
 public class DashboardServlet extends HttpServlet {
 
-    private ReportesService reportesService;
+    private final ReportesService reportesService;
 
-    @Override
-    public void init() {
-        reportesService = new ReportesService();
+    public DashboardServlet(ReportesService reportesService) {
+        this.reportesService = reportesService;
     }
 
     @Override

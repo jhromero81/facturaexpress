@@ -19,15 +19,14 @@ import java.util.Map;
 
 public class ReportesServlet extends HttpServlet {
 
-    private ReportesService reportesService;
-    private ReporteService reporteService;
-    private PdfService pdfService;
+    private final ReportesService reportesService;
+    private final ReporteService reporteService;
+    private final PdfService pdfService;
 
-    @Override
-    public void init() {
-        reportesService = new ReportesService();
-        reporteService = new ReporteService();
-        pdfService = new PdfService();
+    public ReportesServlet(ReportesService reportesService, ReporteService reporteService, PdfService pdfService) {
+        this.reportesService = reportesService;
+        this.reporteService = reporteService;
+        this.pdfService = pdfService;
     }
 
     @Override

@@ -16,13 +16,12 @@ import java.util.Optional;
 
 public class ClienteServlet extends HttpServlet {
 
-    private ClienteService clienteService;
-    private LogAuditoriaService logService;
+    private final ClienteService clienteService;
+    private final LogAuditoriaService logService;
 
-    @Override
-    public void init() {
-        clienteService = new ClienteService();
-        logService = new LogAuditoriaService();
+    public ClienteServlet(ClienteService clienteService, LogAuditoriaService logService) {
+        this.clienteService = clienteService;
+        this.logService = logService;
     }
 
     @Override

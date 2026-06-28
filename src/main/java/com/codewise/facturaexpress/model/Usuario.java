@@ -1,22 +1,40 @@
 package com.codewise.facturaexpress.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * Entidad que mapea la tabla "usuarios" de la base de datos.
- * Almacena las credenciales y datos de los usuarios del sistema.
- */
+@Entity
+@Table(name = "usuarios")
 public class Usuario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
     private String username;
-    private String passwordHash; // hash de la contraseña (BCrypt)
+
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
     private String nombre;
     private String email;
-    private String rol;          // rol del usuario: ADMIN, USER, etc.
-    private boolean activo;      // indica si la cuenta está activa o deshabilitada
+
+    @Column(nullable = false)
+    private String rol;
+
+    @Column(nullable = false)
+    private boolean activo;
+
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
     public Usuario() {}
+
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreacion = LocalDateTime.now();
+    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
