@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+// Servlet para el CRUD de productos
 public class ProductoServlet extends HttpServlet {
 
     private final ProductoService productoService;
@@ -25,6 +26,7 @@ public class ProductoServlet extends HttpServlet {
         this.logService = logService;
     }
 
+    // Maneja GET: listar productos, mostrar formulario nuevo, editar o eliminar
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -53,6 +55,7 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
+    // Maneja POST: guardar o actualizar producto
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -75,6 +78,7 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
+    // Obtiene la lista de productos y la envia a la vista
     private void listarProductos(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -87,6 +91,7 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
+    // Muestra el formulario de edicion con los datos del producto
     private void mostrarFormularioEdicion(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -105,6 +110,7 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
+    // Guarda un nuevo producto en la base de datos
     private void guardarProducto(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -142,6 +148,7 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
+    // Actualiza los datos de un producto existente
     private void actualizarProducto(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -178,6 +185,7 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
+    // Elimina un producto por su ID
     private void eliminarProducto(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
         try {

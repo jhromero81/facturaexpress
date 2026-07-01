@@ -7,12 +7,14 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.*;
 
+// Repositorio personalizado para consultas de reportes mediante SQL nativo
 @Repository
 public class ReportesRepository {
 
     @PersistenceContext
     private EntityManager em;
 
+    // Cuenta las facturas del dia actual
     public int facturasDelDia() {
         Number result = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM facturas WHERE DATE(fecha) = CURDATE()")
@@ -20,6 +22,7 @@ public class ReportesRepository {
         return result != null ? result.intValue() : 0;
     }
 
+    // Suma el total de ventas del dia actual
     public BigDecimal ventasDelDia() {
         BigDecimal result = (BigDecimal) em.createNativeQuery(
                 "SELECT COALESCE(SUM(total), 0) FROM facturas WHERE DATE(fecha) = CURDATE()")
@@ -27,6 +30,7 @@ public class ReportesRepository {
         return result != null ? result : BigDecimal.ZERO;
     }
 
+    // Calcula el ticket promedio del dia actual
     public BigDecimal ticketPromedio() {
         BigDecimal result = (BigDecimal) em.createNativeQuery(
                 "SELECT COALESCE(AVG(total), 0) FROM facturas WHERE DATE(fecha) = CURDATE()")
@@ -34,6 +38,7 @@ public class ReportesRepository {
         return result != null ? result : BigDecimal.ZERO;
     }
 
+    // Cuenta las facturas del mes actual
     public int facturasDelMes() {
         Number result = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM facturas WHERE MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())")
@@ -41,6 +46,7 @@ public class ReportesRepository {
         return result != null ? result.intValue() : 0;
     }
 
+    // Suma el total de ventas del mes actual
     public BigDecimal ventasDelMes() {
         BigDecimal result = (BigDecimal) em.createNativeQuery(
                 "SELECT COALESCE(SUM(total), 0) FROM facturas WHERE MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())")
@@ -48,6 +54,7 @@ public class ReportesRepository {
         return result != null ? result : BigDecimal.ZERO;
     }
 
+    // Obtiene las ventas diarias de los ultimos 7 dias
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ventasSemana() {
         List<Object[]> rows = em.createNativeQuery(
@@ -65,6 +72,7 @@ public class ReportesRepository {
         return result;
     }
 
+    // Obtiene las ventas mensuales de los ultimos 6 meses
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ventasMensuales() {
         List<Object[]> rows = em.createNativeQuery(
@@ -82,6 +90,7 @@ public class ReportesRepository {
         return result;
     }
 
+    // Obtiene los N productos mas vendidos
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> topProductos(int limite) {
         List<Object[]> rows = em.createNativeQuery(
@@ -100,6 +109,7 @@ public class ReportesRepository {
         return result;
     }
 
+    // Obtiene las ventas trimestrales del ultimo ano
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ventasTrimestrales() {
         List<Object[]> rows = em.createNativeQuery(
@@ -117,6 +127,7 @@ public class ReportesRepository {
         return result;
     }
 
+    // Obtiene las ventas anuales de los ultimos 5 anos
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ventasAnuales() {
         List<Object[]> rows = em.createNativeQuery(
@@ -134,6 +145,7 @@ public class ReportesRepository {
         return result;
     }
 
+    // Obtiene las ultimas N transacciones con datos del cliente
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ultimasTransacciones(int limite) {
         List<Object[]> rows = em.createNativeQuery(

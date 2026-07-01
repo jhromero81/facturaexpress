@@ -5,6 +5,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+// Servicio para el envio de correos electronicos con adjuntos PDF
 @Service
 public class EmailService {
 
@@ -14,6 +15,7 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
+    // Envia un correo con una factura en PDF adjunta
     public boolean enviarFactura(String destinatario, String asunto, String cuerpo, byte[] pdfAdjunto, String nombrePdf) {
         if (destinatario == null || destinatario.isBlank()) return false;
         if (mailSender == null) return false;

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+// Servicio que gestiona la configuracion de la empresa
 @Service
 public class ConfiguracionEmpresaService {
 
@@ -16,11 +17,13 @@ public class ConfiguracionEmpresaService {
         this.configRepository = configRepository;
     }
 
+    // Obtiene la configuracion actual de la empresa
     public ConfiguracionEmpresa obtenerConfiguracion() {
         Optional<ConfiguracionEmpresa> opt = configRepository.findFirstByOrderByIdAsc();
         return opt.orElse(null);
     }
 
+    // Guarda o actualiza la configuracion de la empresa (solo un registro)
     @Transactional
     public ConfiguracionEmpresa guardarConfiguracion(ConfiguracionEmpresa config) {
         Optional<ConfiguracionEmpresa> existente = configRepository.findFirstByOrderByIdAsc();

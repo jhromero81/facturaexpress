@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+// Entidad que representa un producto del inventario
 @Entity
 @Table(name = "productos")
 public class Producto {

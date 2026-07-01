@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+// Servlet para gestionar los errores del sistema
 public class ErrorSistemaServlet extends HttpServlet {
 
     private final ErrorSistemaService errorService;
@@ -21,6 +22,7 @@ public class ErrorSistemaServlet extends HttpServlet {
         this.logService = logService;
     }
 
+    // Lista los errores y permite filtrar por tipo o marcar como resueltos
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -53,6 +55,7 @@ public class ErrorSistemaServlet extends HttpServlet {
         }
     }
 
+    // Marca un error como resuelto
     private void marcarResuelto(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
         try {

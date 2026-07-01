@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+// Entidad que representa un reporte generado
 @Entity
 @Table(name = "reportes")
 public class Reporte {
@@ -34,6 +35,7 @@ public class Reporte {
 
     public Reporte() {}
 
+    // Asigna la fecha de creacion antes de persistir
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();

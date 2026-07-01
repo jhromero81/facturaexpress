@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+// Entidad que representa un error registrado en el sistema
 @Entity
 @Table(name = "errores_sistema")
 public class ErrorSistema {
@@ -31,6 +32,7 @@ public class ErrorSistema {
 
     public ErrorSistema() {}
 
+    // Inicializa la fecha de creacion y estado resuelto antes de persistir
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();

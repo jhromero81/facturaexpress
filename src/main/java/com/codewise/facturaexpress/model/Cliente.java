@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+// Entidad que representa un cliente
 @Entity
 @Table(name = "clientes")
 public class Cliente {
@@ -33,6 +34,7 @@ public class Cliente {
         this.fechaCreacion = fechaCreacion;
     }
 
+    // Asigna la fecha de creacion antes de persistir
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();

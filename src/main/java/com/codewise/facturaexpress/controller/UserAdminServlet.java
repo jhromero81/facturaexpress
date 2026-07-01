@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+// Servlet para la administracion de usuarios del sistema
 public class UserAdminServlet extends HttpServlet {
 
     private final UsuarioAdminService usuarioAdminService;
@@ -22,6 +23,7 @@ public class UserAdminServlet extends HttpServlet {
         this.logService = logService;
     }
 
+    // Maneja GET: listar usuarios, mostrar formulario nuevo o editar
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -54,6 +56,7 @@ public class UserAdminServlet extends HttpServlet {
         }
     }
 
+    // Maneja POST: guardar, actualizar, activar/desactivar o eliminar usuario
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -72,6 +75,7 @@ public class UserAdminServlet extends HttpServlet {
             if ("guardar".equals(action)) {
                 String idStr = req.getParameter("id");
                 if (idStr != null && !idStr.isBlank()) {
+                    // Actualizar usuario existente
                     Long id = Long.parseLong(idStr);
                     Usuario u = new Usuario();
                     u.setId(id);
@@ -86,6 +90,7 @@ public class UserAdminServlet extends HttpServlet {
                     }
                     logService.registrar(AuthUtil.getUsuario(req), "UPDATE usuario id=" + id, "usuarios", id, req);
                 } else {
+                    // Crear nuevo usuario
                     Usuario u = new Usuario();
                     u.setUsername(req.getParameter("username"));
                     u.setNombre(req.getParameter("nombre"));
@@ -96,11 +101,13 @@ public class UserAdminServlet extends HttpServlet {
                 }
                 resp.sendRedirect(req.getContextPath() + "/usuarios");
             } else if ("toggleActivo".equals(action)) {
+                // Activar o desactivar un usuario
                 Long id = Long.parseLong(req.getParameter("id"));
                 boolean activo = "true".equals(req.getParameter("activo"));
                 usuarioAdminService.activarODesactivar(id, activo);
                 resp.sendRedirect(req.getContextPath() + "/usuarios");
             } else if ("eliminar".equals(action)) {
+                // Eliminar un usuario
                 Long id = Long.parseLong(req.getParameter("id"));
                 usuarioAdminService.eliminarUsuario(id);
                 logService.registrar(AuthUtil.getUsuario(req), "DELETE usuario id=" + id, "usuarios", id, req);

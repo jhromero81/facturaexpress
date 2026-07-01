@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+// Servicio para la administracion de usuarios del sistema
 @Service
 public class UsuarioAdminService {
 
@@ -20,14 +21,17 @@ public class UsuarioAdminService {
         this.encoder = new BCryptPasswordEncoder();
     }
 
+    // Obtiene todos los usuarios registrados
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
     }
 
+    // Busca un usuario por su ID
     public Optional<Usuario> buscarPorId(Long id) {
         return usuarioRepository.findById(id);
     }
 
+    // Crea un nuevo usuario con contrasena encriptada y rol por defecto
     @Transactional
     public Usuario crearUsuario(Usuario usuario, String passwordPlano) {
         if (usuario.getUsername() == null || usuario.getUsername().isBlank()) {
@@ -44,6 +48,7 @@ public class UsuarioAdminService {
         return usuarioRepository.save(usuario);
     }
 
+    // Actualiza los datos de un usuario existente
     @Transactional
     public Usuario actualizarUsuario(Usuario usuario) {
         if (usuario.getId() == null) {
@@ -58,6 +63,7 @@ public class UsuarioAdminService {
         return usuarioRepository.save(existente);
     }
 
+    // Cambia la contrasena de un usuario
     @Transactional
     public void cambiarPassword(Long id, String nuevaPassword) {
         if (nuevaPassword == null || nuevaPassword.length() < 4) {
@@ -69,6 +75,7 @@ public class UsuarioAdminService {
         usuarioRepository.save(usr);
     }
 
+    // Activa o desactiva un usuario
     @Transactional
     public void activarODesactivar(Long id, boolean activo) {
         Usuario usr = usuarioRepository.findById(id)
@@ -77,6 +84,7 @@ public class UsuarioAdminService {
         usuarioRepository.save(usr);
     }
 
+    // Elimina un usuario por su ID
     @Transactional
     public void eliminarUsuario(Long id) {
         usuarioRepository.deleteById(id);

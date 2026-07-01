@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+// Servlet para el CRUD de clientes
 public class ClienteServlet extends HttpServlet {
 
     private final ClienteService clienteService;
@@ -24,6 +25,7 @@ public class ClienteServlet extends HttpServlet {
         this.logService = logService;
     }
 
+    // Maneja solicitudes GET: listar, mostrar formulario nuevo, editar o eliminar
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -52,6 +54,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
+    // Maneja solicitudes POST: guardar o actualizar cliente
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -74,6 +77,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
+    // Obtiene la lista de clientes y la envia a la vista
     private void listarClientes(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -86,6 +90,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
+    // Muestra el formulario de edicion con los datos del cliente
     private void mostrarFormularioEdicion(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -104,6 +109,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
+    // Guarda un nuevo cliente en la base de datos
     private void guardarCliente(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -129,6 +135,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
+    // Actualiza los datos de un cliente existente
     private void actualizarCliente(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -155,6 +162,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
+    // Elimina un cliente por su ID
     private void eliminarCliente(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
         try {
@@ -172,6 +180,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
+    // Construye un objeto Cliente a partir de los parametros de la solicitud
     private Cliente construirClienteDesdeRequest(HttpServletRequest req) {
         Cliente c = new Cliente();
         if (req.getParameter("id") != null) {

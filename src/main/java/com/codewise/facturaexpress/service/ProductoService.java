@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+// Servicio que implementa la logica de negocio para la entidad Producto
 @Service
 public class ProductoService {
 
@@ -18,6 +19,7 @@ public class ProductoService {
         this.productoRepository = productoRepository;
     }
 
+    // Guarda un nuevo producto con validaciones de nombre, precio y stock
     @Transactional
     public Producto guardarProducto(Producto producto) {
         if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
@@ -32,6 +34,7 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
+    // Busca un producto por su ID
     public Optional<Producto> buscarPorId(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de producto invalido");
@@ -39,10 +42,12 @@ public class ProductoService {
         return productoRepository.findById(id);
     }
 
+    // Obtiene todos los productos registrados
     public List<Producto> listarProductos() {
         return productoRepository.findAll();
     }
 
+    // Actualiza los datos de un producto existente
     @Transactional
     public Producto actualizarProducto(Producto producto) {
         if (producto.getId() == null) {
@@ -60,6 +65,7 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
+    // Elimina un producto por su ID
     @Transactional
     public void eliminarProducto(Long id) {
         if (id == null || id <= 0) {
@@ -68,6 +74,7 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
 
+    // Descuenta la cantidad del stock de un producto
     @Transactional
     public void descontarStock(Long productoId, int cantidad) {
         int updated = productoRepository.descontarStock(productoId, cantidad);

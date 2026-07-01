@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 
+// Servlet para gestionar la configuracion de la empresa
 public class ConfiguracionServlet extends HttpServlet {
 
     private final ConfiguracionEmpresaService configService;
@@ -23,6 +24,7 @@ public class ConfiguracionServlet extends HttpServlet {
         this.logService = logService;
     }
 
+    // Muestra el formulario de configuracion con los datos actuales
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -47,6 +49,7 @@ public class ConfiguracionServlet extends HttpServlet {
         }
     }
 
+    // Guarda o actualiza la configuracion de la empresa
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

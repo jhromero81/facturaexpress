@@ -17,6 +17,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+// Servlet para generar y exportar reportes de ventas
 public class ReportesServlet extends HttpServlet {
 
     private final ReportesService reportesService;
@@ -29,6 +30,7 @@ public class ReportesServlet extends HttpServlet {
         this.pdfService = pdfService;
     }
 
+    // Carga los datos de reportes y los envia a la vista
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -60,6 +62,7 @@ public class ReportesServlet extends HttpServlet {
         }
     }
 
+    // Maneja POST: generar un reporte o exportar a PDF
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -87,6 +90,7 @@ public class ReportesServlet extends HttpServlet {
                 doGet(req, resp);
             }
         } else if ("exportarPdf".equals(action)) {
+            // Exporta los datos del reporte a PDF
             try {
                 String chartBase64 = req.getParameter("chartImage");
                 String periodo = req.getParameter("periodo");

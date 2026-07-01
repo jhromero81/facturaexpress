@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+// Servlet que muestra el panel principal con indicadores y resumenes
 public class DashboardServlet extends HttpServlet {
 
     private final ReportesService reportesService;
@@ -17,6 +18,7 @@ public class DashboardServlet extends HttpServlet {
         this.reportesService = reportesService;
     }
 
+    // Carga los indicadores del dashboard y los envia a la vista
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

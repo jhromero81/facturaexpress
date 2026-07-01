@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+// Servlet para consultar los registros de auditoria del sistema
 public class LogAuditoriaServlet extends HttpServlet {
 
     private final LogAuditoriaService logService;
@@ -17,6 +18,7 @@ public class LogAuditoriaServlet extends HttpServlet {
         this.logService = logService;
     }
 
+    // Lista los logs con opcion de filtrar por tabla o por usuario
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

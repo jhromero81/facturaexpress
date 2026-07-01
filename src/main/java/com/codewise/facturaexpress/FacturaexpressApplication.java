@@ -1,5 +1,6 @@
 package com.codewise.facturaexpress;
 
+// Importaciones de controladores y servicios de la aplicacion
 import com.codewise.facturaexpress.controller.*;
 import com.codewise.facturaexpress.service.*;
 import org.springframework.boot.SpringApplication;
@@ -9,13 +10,16 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
+// Clase principal que inicia la aplicacion Spring Boot
 @SpringBootApplication
 public class FacturaexpressApplication {
 
+	// Metodo principal punto de entrada de la aplicacion
 	public static void main(String[] args) {
 		SpringApplication.run(FacturaexpressApplication.class, args);
 	}
 
+	// Bean que registra el servlet de clientes en la ruta /clientes
 	@Bean
 	public ServletRegistrationBean<ClienteServlet> clienteServlet(
 			ClienteService clienteService, LogAuditoriaService logService) {
@@ -25,6 +29,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de productos en la ruta /productos
 	@Bean
 	public ServletRegistrationBean<ProductoServlet> productoServlet(
 			ProductoService productoService, LogAuditoriaService logService) {
@@ -34,6 +39,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de facturas en la ruta /facturas
 	@Bean
 	public ServletRegistrationBean<FacturaServlet> facturaServlet(
 			FacturaService facturaService, ClienteService clienteService,
@@ -44,6 +50,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de inicio de sesion en la ruta /login
 	@Bean
 	public ServletRegistrationBean<LoginServlet> loginServlet(LoginService loginService) {
 		ServletRegistrationBean<LoginServlet> bean =
@@ -52,11 +59,13 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de cierre de sesion en la ruta /logout
 	@Bean
 	public ServletRegistrationBean<LogoutServlet> logoutServlet() {
 		return new ServletRegistrationBean<>(new LogoutServlet(), "/logout");
 	}
 
+	// Bean que registra el servlet del panel principal en la ruta /dashboard
 	@Bean
 	public ServletRegistrationBean<DashboardServlet> dashboardServlet(ReportesService reportesService) {
 		ServletRegistrationBean<DashboardServlet> bean =
@@ -65,6 +74,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de punto de venta en la ruta /ventas
 	@Bean
 	public ServletRegistrationBean<VentaServlet> ventaServlet(
 			FacturaService facturaService, ClienteService clienteService,
@@ -75,6 +85,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de reportes en la ruta /reportes
 	@Bean
 	public ServletRegistrationBean<ReportesServlet> reportesServlet(
 			ReportesService reportesService, ReporteService reporteService, PdfService pdfService) {
@@ -84,6 +95,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de configuracion en la ruta /configuracion
 	@Bean
 	public ServletRegistrationBean<ConfiguracionServlet> configuracionServlet(
 			ConfiguracionEmpresaService configService, LogAuditoriaService logService) {
@@ -93,6 +105,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de errores del sistema en la ruta /errores
 	@Bean
 	public ServletRegistrationBean<ErrorSistemaServlet> errorSistemaServlet(
 			ErrorSistemaService errorService, LogAuditoriaService logService) {
@@ -102,6 +115,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de logs de auditoria en la ruta /logs
 	@Bean
 	public ServletRegistrationBean<LogAuditoriaServlet> logAuditoriaServlet(LogAuditoriaService logService) {
 		ServletRegistrationBean<LogAuditoriaServlet> bean =
@@ -110,6 +124,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de administracion de usuarios en la ruta /usuarios
 	@Bean
 	public ServletRegistrationBean<UserAdminServlet> userAdminServlet(
 			UsuarioAdminService usuarioAdminService, LogAuditoriaService logService) {
@@ -119,6 +134,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que registra el servlet de respaldo y restauracion en la ruta /backup
 	@Bean
 	public ServletRegistrationBean<BackupRestoreServlet> backupRestoreServlet() {
 		ServletRegistrationBean<BackupRestoreServlet> bean =
@@ -127,6 +143,7 @@ public class FacturaexpressApplication {
 		return bean;
 	}
 
+	// Bean que configura la pagina de bienvenida como index.jsp
 	@Bean
 	public WebServerFactoryCustomizer<TomcatServletWebServerFactory> welcomePageCustomizer() {
 		return factory -> factory.addContextCustomizers(

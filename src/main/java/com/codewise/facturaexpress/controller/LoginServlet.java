@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Optional;
 
+// Servlet para la autenticacion de usuarios (inicio de sesion)
 public class LoginServlet extends HttpServlet {
 
     private final LoginService loginService;
@@ -20,6 +21,7 @@ public class LoginServlet extends HttpServlet {
         this.loginService = loginService;
     }
 
+    // Muestra el formulario de login o redirige al dashboard si ya hay sesion
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -31,6 +33,7 @@ public class LoginServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(req, resp);
     }
 
+    // Procesa el formulario de login: autentica y crea la sesion
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

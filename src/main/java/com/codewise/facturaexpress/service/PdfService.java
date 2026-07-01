@@ -18,15 +18,19 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+// Servicio para la generacion de documentos PDF (facturas y reportes)
 @Service
 public class PdfService {
 
+    // Formato de fecha para los PDFs
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    // Colores corporativos para el disenio de los PDFs
     private static final Color ACCENT = new Color(26, 188, 156);
     private static final Color DARK = new Color(26, 35, 53);
     private static final Color MUTED = new Color(144, 164, 174);
     private static final Color BG_LIGHT = new Color(245, 245, 245);
 
+    // Genera el PDF de una factura con cabecera, tabla de detalles y total
     public byte[] generarPdfFactura(Factura factura) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -90,6 +94,7 @@ public class PdfService {
         return baos.toByteArray();
     }
 
+    // Genera un PDF de reporte de ventas con KPIs, grafico y top productos
     public byte[] generarPdfReporte(
             String tituloPeriodo,
             byte[] chartImage,
@@ -200,6 +205,7 @@ public class PdfService {
         return baos.toByteArray();
     }
 
+    // Agrega una celda KPI a la tabla del reporte
     private void addKpiCell(PdfPTable table, String value, String label) {
         PdfPCell cell = new PdfPCell();
         cell.setPadding(8);
@@ -213,6 +219,7 @@ public class PdfService {
         table.addCell(cell);
     }
 
+    // Formatea un BigDecimal como moneda sin decimales
     private String formato(BigDecimal value) {
         if (value == null) return "0";
         return String.format("%,.0f", value);

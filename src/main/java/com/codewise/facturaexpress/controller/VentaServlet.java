@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+// Servlet para el punto de venta (POS)
 public class VentaServlet extends HttpServlet {
 
     private final FacturaService facturaService;
@@ -28,6 +29,7 @@ public class VentaServlet extends HttpServlet {
         this.logService = logService;
     }
 
+    // Muestra la interfaz del punto de venta con clientes y productos
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -48,6 +50,7 @@ public class VentaServlet extends HttpServlet {
         }
     }
 
+    // Procesa el POST para finalizar una venta (crear factura)
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -126,6 +129,7 @@ public class VentaServlet extends HttpServlet {
         }
     }
 
+    // Carga los datos de clientes y productos para el formulario POS
     private void cargarDatos(HttpServletRequest req) {
         try {
             req.setAttribute("clientes", clienteService.listarClientes());

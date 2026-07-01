@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+// Entidad que registra la bitacora de auditoria del sistema
 @Entity
 @Table(name = "logs_auditoria")
 public class LogAuditoria {
@@ -32,6 +33,7 @@ public class LogAuditoria {
     @Column(nullable = false, updatable = false)
     private LocalDateTime fecha;
 
+    // Asigna la fecha actual antes de persistir
     @PrePersist
     protected void onCreate() {
         this.fecha = LocalDateTime.now();

@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+// Servicio principal para la gestion de facturas: creacion, calculos, documentos y envio
 @Service
 public class FacturaService {
 
@@ -36,11 +37,13 @@ public class FacturaService {
         this.emailService = emailService;
     }
 
+    // Crea una factura sin descuento
     @Transactional
     public Factura crearFactura(Factura factura) {
         return crearFactura(factura, 0);
     }
 
+    // Crea una factura validando cliente, detalles, stock, calculando subtotal, descuento, IVA y total
     @Transactional
     public Factura crearFactura(Factura factura, int descuentoPorcentaje) {
         if (factura.getClienteId() == null) {
@@ -101,6 +104,7 @@ public class FacturaService {
         return buscarPorId(creada.getId()).orElse(creada);
     }
 
+    // Genera los documentos XML y PDF de la factura y envia por correo al cliente
     public void generarDocumentos(Factura factura) {
         try {
             String xml = xmlService.generarXmlFactura(factura);
@@ -141,6 +145,7 @@ public class FacturaService {
         }
     }
 
+    // Busca una factura por ID incluyendo nombre del cliente y detalles
     public Optional<Factura> buscarPorId(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de factura invalido");
@@ -155,6 +160,7 @@ public class FacturaService {
         return facturaOpt;
     }
 
+    // Obtiene todas las facturas con nombre de cliente y detalles
     public List<Factura> listarFacturas() {
         List<Factura> facturas = facturaRepository.findAllWithClienteNombre();
         for (Factura f : facturas) {
@@ -166,6 +172,7 @@ public class FacturaService {
         return facturas;
     }
 
+    // Actualiza el estado de una factura
     @Transactional
     public void actualizarEstado(Long id, String nuevoEstado) {
         if (id == null || id <= 0) {
@@ -180,6 +187,7 @@ public class FacturaService {
         facturaRepository.save(factura);
     }
 
+    // Elimina una factura y sus detalles asociados
     @Transactional
     public void eliminarFactura(Long id) {
         if (id == null || id <= 0) {

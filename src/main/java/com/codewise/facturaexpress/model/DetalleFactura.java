@@ -3,6 +3,7 @@ package com.codewise.facturaexpress.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+// Entidad que representa el detalle de una factura (linea de producto)
 @Entity
 @Table(name = "detalles_factura")
 public class DetalleFactura {

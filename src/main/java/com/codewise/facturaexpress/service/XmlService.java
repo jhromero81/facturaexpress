@@ -8,11 +8,14 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
+// Servicio para la generacion de XML de facturas electronicas (formato DIAN)
 @Service
 public class XmlService {
 
+    // Formato de fecha ISO para el XML
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
+    // Genera el XML completo de una factura electronica
     public String generarXmlFactura(Factura factura) {
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -45,6 +48,7 @@ public class XmlService {
         return xml.toString();
     }
 
+    // Escapa caracteres especiales XML
     private String escape(String s) {
         if (s == null) return "";
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&apos;");

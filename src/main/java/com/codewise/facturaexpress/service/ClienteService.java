@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+// Servicio que implementa la logica de negocio para la entidad Cliente
 @Service
 public class ClienteService {
 
@@ -17,6 +18,7 @@ public class ClienteService {
         this.clienteRepository = clienteRepository;
     }
 
+    // Guarda un nuevo cliente con validaciones de nombre y email
     @Transactional
     public Cliente guardarCliente(Cliente cliente) {
         if (cliente.getNombre() == null || cliente.getNombre().trim().isEmpty()) {
@@ -28,6 +30,7 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    // Busca un cliente por su ID
     public Optional<Cliente> buscarPorId(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de cliente invalido");
@@ -35,10 +38,12 @@ public class ClienteService {
         return clienteRepository.findById(id);
     }
 
+    // Obtiene todos los clientes registrados
     public List<Cliente> listarClientes() {
         return clienteRepository.findAll();
     }
 
+    // Actualiza los datos de un cliente existente
     @Transactional
     public Cliente actualizarCliente(Cliente cliente) {
         if (cliente.getId() == null) {
@@ -53,6 +58,7 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    // Elimina un cliente por su ID
     @Transactional
     public void eliminarCliente(Long id) {
         if (id == null || id <= 0) {

@@ -11,15 +11,19 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+// Servlet que maneja la creacion, descarga, restauracion y eliminacion de respaldos de base de datos
 public class BackupRestoreServlet extends HttpServlet {
 
+    // Directorio donde se almacenan los archivos de respaldo
     private static final String BACKUP_DIR = System.getProperty("java.io.tmpdir") + "/facturaexpress_backups";
 
+    // Inicializa el directorio de respaldos al arrancar el servlet
     @Override
     public void init() {
         new java.io.File(BACKUP_DIR).mkdirs();
     }
 
+    // Maneja solicitudes GET: listar respaldos o descargar un archivo
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -53,6 +57,7 @@ public class BackupRestoreServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/jsp/backup.jsp").forward(req, resp);
     }
 
+    // Maneja solicitudes POST: crear, restaurar o eliminar respaldos
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -67,6 +72,7 @@ public class BackupRestoreServlet extends HttpServlet {
         }
         String action = req.getParameter("action");
 
+        // Crea un respaldo usando mysqldump
         if ("crear".equals(action)) {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String filename = "backup_" + timestamp + ".sql";
@@ -113,6 +119,7 @@ public class BackupRestoreServlet extends HttpServlet {
                 req.getRequestDispatcher("/WEB-INF/jsp/backup.jsp").forward(req, resp);
             }
         } else if ("restaurar".equals(action)) {
+            // Restaura un respaldo usando mysql
             String filename = req.getParameter("file");
             if (filename == null || filename.contains("..")) {
                 req.setAttribute("error", "Nombre de archivo invalido");
@@ -166,6 +173,7 @@ public class BackupRestoreServlet extends HttpServlet {
                 req.getRequestDispatcher("/WEB-INF/jsp/backup.jsp").forward(req, resp);
             }
         } else if ("eliminar".equals(action)) {
+            // Elimina un archivo de respaldo
             String filename = req.getParameter("file");
             if (filename != null && !filename.contains("..")) {
                 File f = new File(BACKUP_DIR, filename);

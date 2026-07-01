@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// Servlet para el CRUD de facturas
 public class FacturaServlet extends HttpServlet {
 
     private final FacturaService facturaService;
@@ -36,6 +37,7 @@ public class FacturaServlet extends HttpServlet {
         this.logService = logService;
     }
 
+    // Maneja GET: listar facturas, mostrar formulario, detalle o eliminar
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -67,6 +69,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
+    // Maneja POST: guardar factura o cambiar estado
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -89,6 +92,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
+    // Obtiene el listado de facturas y lo envia a la vista
     private void listarFacturas(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -105,6 +109,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
+    // Muestra el formulario para crear una nueva factura con clientes y productos
     private void mostrarFormularioCreacion(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -119,6 +124,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
+    // Muestra el detalle de una factura especifica
     private void mostrarDetalle(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -137,6 +143,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
+    // Guarda una nueva factura con sus detalles
     private void guardarFactura(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -187,6 +194,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
+    // Cambia el estado de una factura (PENDIENTE, PAGADA, ANULADA, etc)
     private void cambiarEstado(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
         try {
@@ -205,6 +213,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
+    // Elimina una factura por su ID
     private void eliminarFactura(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
         try {
@@ -222,6 +231,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
+    // Carga los datos necesarios para el formulario de factura
     private void cargarDatosFormulario(HttpServletRequest req) {
         try {
             req.setAttribute("clientes", clienteService.listarClientes());

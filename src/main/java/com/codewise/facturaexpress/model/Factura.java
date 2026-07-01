@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+// Entidad que representa una factura electronica
 @Entity
 @Table(name = "facturas")
 public class Factura {

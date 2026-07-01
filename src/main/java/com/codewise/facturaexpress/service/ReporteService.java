@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+// Servicio para la generacion y gestion de reportes
 @Service
 public class ReporteService {
 
@@ -18,6 +19,7 @@ public class ReporteService {
         this.reporteRepository = reporteRepository;
     }
 
+    // Genera un nuevo reporte con tipo, rango de fechas y usuario
     @Transactional
     public Reporte generarReporte(String tipo, LocalDate inicio, LocalDate fin, Long usuarioId) {
         Reporte reporte = new Reporte();
@@ -29,18 +31,22 @@ public class ReporteService {
         return reporteRepository.save(reporte);
     }
 
+    // Obtiene todos los reportes registrados
     public List<Reporte> listarReportes() {
         return reporteRepository.findAllWithUsuarioNombre();
     }
 
+    // Filtra reportes por tipo
     public List<Reporte> listarPorTipo(String tipo) {
         return reporteRepository.findByTipo(tipo);
     }
 
+    // Busca un reporte por su ID
     public Optional<Reporte> buscarPorId(Long id) {
         return reporteRepository.findById(id);
     }
 
+    // Elimina un reporte por su ID
     @Transactional
     public void eliminarReporte(Long id) {
         reporteRepository.deleteById(id);
