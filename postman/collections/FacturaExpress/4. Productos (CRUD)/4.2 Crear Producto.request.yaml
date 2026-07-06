@@ -1,0 +1,24 @@
+$kind: http-request
+url: "{{base_url}}/productos?action=guardar"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: guardar
+body:
+  type: urlencoded
+  content:
+    action: guardar
+    _csrf_token: "{{csrf_token}}"
+    nombre: Producto Test Postman
+    descripcion: Producto creado desde Postman
+    precio: "25000"
+    stock: "100"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Redireccion despues de crear producto', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+    language: text/javascript
+order: 2000

@@ -1,0 +1,3 @@
+$kind: collection
+description: "Gestion de facturas electronicas: listar, crear, detalle, cambiar estado, eliminar"
+order: 5000

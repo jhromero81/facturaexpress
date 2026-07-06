@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{base_url}}/productos?action=actualizar"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: actualizar
+body:
+  type: urlencoded
+  content:
+    action: actualizar
+    _csrf_token: "{{csrf_token}}"
+    id: "1"
+    nombre: Producto Actualizado Postman
+    descripcion: Producto actualizado desde Postman
+    precio: "35000"
+    stock: "50"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Redireccion despues de actualizar producto', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+    language: text/javascript
+order: 3000

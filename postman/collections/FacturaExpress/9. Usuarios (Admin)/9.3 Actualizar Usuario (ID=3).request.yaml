@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{base_url}}/usuarios?action=guardar"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: guardar
+body:
+  type: urlencoded
+  content:
+    action: guardar
+    _csrf_token: "{{csrf_token}}"
+    id: "3"
+    username: vendedor_test
+    nombre: Vendedor Actualizado Postman
+    email: vendedor_actualizado@correo.com
+    rol: VENDEDOR
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Usuario actualizado exitosamente', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+    language: text/javascript
+order: 3000

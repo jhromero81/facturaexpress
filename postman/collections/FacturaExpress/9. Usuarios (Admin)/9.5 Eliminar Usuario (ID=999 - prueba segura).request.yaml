@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/usuarios?action=eliminar"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: eliminar
+body:
+  type: urlencoded
+  content:
+    action: eliminar
+    _csrf_token: "{{csrf_token}}"
+    id: "999"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Redireccion despues de eliminar', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+    language: text/javascript
+order: 5000

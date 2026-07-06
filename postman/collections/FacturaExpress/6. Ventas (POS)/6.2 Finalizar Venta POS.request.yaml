@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{base_url}}/ventas?action=finalizar"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: finalizar
+body:
+  type: urlencoded
+  content:
+    action: finalizar
+    _csrf_token: "{{csrf_token}}"
+    clienteId: "1"
+    productoId: "1"
+    cantidad: "3"
+    precioUnitario: "15000"
+    descuentoPorcentaje: "10"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Venta finalizada exitosamente', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+
+      pm.test('Muestra pagina de confirmacion', function () {
+          var html = pm.response.text();
+          pm.expect(html).to.include('confirmacion');
+      });
+    language: text/javascript
+order: 2000

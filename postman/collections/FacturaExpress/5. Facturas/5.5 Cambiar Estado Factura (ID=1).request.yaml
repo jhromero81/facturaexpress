@@ -1,0 +1,29 @@
+$kind: http-request
+url: "{{base_url}}/facturas?action=cambiarEstado"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: cambiarEstado
+body:
+  type: urlencoded
+  content:
+    action: cambiarEstado
+    _csrf_token: "{{csrf_token}}"
+    id: "1"
+    estado: ENVIADA
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Estado cambiado exitosamente', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+
+      pm.test('Redirige a lista de facturas', function () {
+          if (pm.response.code === 302 || pm.response.code === 303) {
+              var loc = pm.response.headers.get('Location');
+              pm.expect(loc).to.include('/facturas');
+          }
+      });
+    language: text/javascript
+order: 5000

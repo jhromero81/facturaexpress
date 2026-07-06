@@ -1,0 +1,3 @@
+$kind: collection
+description: "Gestion de productos: listar, crear, editar, eliminar"
+order: 4000

@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/facturas?action=eliminar&id=999"
+method: GET
+queryParams:
+  action: eliminar
+  id: "999"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Redireccion despues de eliminar factura', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+    language: text/javascript
+order: 6000

@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/backup?action=download&file=backup_inicial.sql"
+method: GET
+queryParams:
+  action: download
+  file: backup_inicial.sql
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Backup descargado', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+
+      pm.test('Content-Type es application/octet-stream', function () {
+          if (pm.response.code === 200) {
+              var ct = pm.response.headers.get('Content-Type');
+              pm.expect(ct).to.include('octet-stream');
+          }
+      });
+    language: text/javascript
+order: 3000

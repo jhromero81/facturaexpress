@@ -1,0 +1,27 @@
+$kind: http-request
+url: "{{base_url}}/logout"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Redirige al login', function () {
+          pm.expect(pm.response.code).to.be.oneOf([302, 303]);
+          var redirectUrl = pm.response.headers.get('Location');
+          pm.expect(redirectUrl).to.include('/login');
+      });
+
+      // Verificar que la sesion se invalido intentando acceder al dashboard
+      pm.sendRequest({
+          url: pm.variables.get('base_url') + '/dashboard',
+          method: 'GET'
+      }, function (err, res) {
+          if (!err) {
+              pm.test('Sesion invalidada - redirige al login', function () {
+                  pm.expect(res.code).to.be.oneOf([302, 303]);
+                  var loc = res.headers.get('Location');
+                  if (loc) pm.expect(loc).to.include('/login');
+              });
+          }
+      });
+    language: text/javascript
+order: 4000

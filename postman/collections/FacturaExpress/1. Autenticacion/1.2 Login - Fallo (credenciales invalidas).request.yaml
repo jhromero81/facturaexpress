@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{base_url}}/login"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+body:
+  type: urlencoded
+  content:
+    username: usuario_invalido
+    password: clave_incorrecta
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Estado 200 (pagina de login con error)', function () {
+          pm.response.to.have.status(200);
+      });
+
+      pm.test('Muestra mensaje de error', function () {
+          var html = pm.response.text();
+          pm.expect(html).to.include('Usuario o contrase');
+      });
+    language: text/javascript
+order: 2000

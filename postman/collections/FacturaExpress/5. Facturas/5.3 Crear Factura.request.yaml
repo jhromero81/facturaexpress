@@ -1,0 +1,31 @@
+$kind: http-request
+url: "{{base_url}}/facturas?action=guardar"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: guardar
+body:
+  type: urlencoded
+  content:
+    action: guardar
+    _csrf_token: "{{csrf_token}}"
+    clienteId: "1"
+    productoId: "1"
+    cantidad: "2"
+    precioUnitario: "15000"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Factura creada exitosamente', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+
+      pm.test('Redirige a lista de facturas', function () {
+          if (pm.response.code === 302 || pm.response.code === 303) {
+              var loc = pm.response.headers.get('Location');
+              pm.expect(loc).to.include('/facturas');
+          }
+      });
+    language: text/javascript
+order: 3000

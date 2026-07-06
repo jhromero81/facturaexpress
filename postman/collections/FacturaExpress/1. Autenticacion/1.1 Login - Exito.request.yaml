@@ -1,0 +1,49 @@
+$kind: http-request
+url: "{{base_url}}/login"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+body:
+  type: urlencoded
+  content:
+    username: "{{username}}"
+    password: "{{password}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Estado 302 (redirect) o 200', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+
+      pm.test('Redirige al dashboard', function () {
+          if (pm.response.code === 302 || pm.response.code === 303) {
+              var redirectUrl = pm.response.headers.get('Location');
+              pm.expect(redirectUrl).to.include('/dashboard');
+          }
+      });
+
+      // Extraer cookies de sesion (Postman las maneja automaticamente)
+      pm.test('Cookie de sesion presente', function () {
+          var cookies = pm.cookies.jar().getAll('http://localhost:8080', function(err, cookies) {
+              if (cookies && cookies.length > 0) {
+                  pm.expect(cookies.length).to.be.at.least(1);
+              }
+          });
+      });
+
+      // Ahora obtener el CSRF token del dashboard
+      pm.sendRequest({
+          url: pm.variables.get('base_url') + '/configuracion',
+          method: 'GET'
+      }, function (err, res) {
+          if (!err) {
+              var html = res.text();
+              var match = html.match(/name="_csrf_token"\s+value="([^"]+)"/);
+              if (match && match[1]) {
+                  pm.collectionVariables.set('csrf_token', match[1]);
+                  console.log('CSRF token obtenido: ' + match[1]);
+              }
+          }
+      });
+    language: text/javascript
+order: 1000

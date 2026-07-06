@@ -1,0 +1,3 @@
+$kind: collection
+description: "Gestion de clientes: listar, crear, editar, eliminar"
+order: 3000

@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{base_url}}/reportes?action=generar"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: generar
+body:
+  type: urlencoded
+  content:
+    action: generar
+    _csrf_token: "{{csrf_token}}"
+    tipo: ventas_diarias
+    fechaInicio: 2026-01-01
+    fechaFin: 2026-12-31
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Reporte generado exitosamente', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+
+      pm.test('Redirige a pagina de reportes', function () {
+          if (pm.response.code === 302 || pm.response.code === 303) {
+              var loc = pm.response.headers.get('Location');
+              pm.expect(loc).to.include('/reportes');
+          }
+      });
+    language: text/javascript
+order: 2000

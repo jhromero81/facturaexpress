@@ -1,0 +1,21 @@
+$kind: http-request
+name: 1.3 Obtener / Refrescar Token CSRF
+url: "{{base_url}}/configuracion"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      var html = pm.response.text();
+      var match = html.match(/name="_csrf_token"\s+value="([^"]+)"/);
+      if (match && match[1]) {
+          pm.collectionVariables.set('csrf_token', match[1]);
+          pm.test('Token CSRF extraido correctamente', function () {
+              pm.expect(match[1].length).to.be.at.least(10);
+          });
+      } else {
+          pm.test('Token CSRF extraido correctamente', function () {
+              pm.expect.fail('No se encontro el token CSRF en la respuesta HTML');
+          });
+      }
+    language: text/javascript
+order: 3000

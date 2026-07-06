@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/errores?action=resolver&id=1"
+method: GET
+queryParams:
+  action: resolver
+  id: "1"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Error resuelto exitosamente', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+
+      pm.test('Redirige a lista de errores', function () {
+          if (pm.response.code === 302 || pm.response.code === 303) {
+              var loc = pm.response.headers.get('Location');
+              pm.expect(loc).to.include('/errores');
+          }
+      });
+    language: text/javascript
+order: 3000

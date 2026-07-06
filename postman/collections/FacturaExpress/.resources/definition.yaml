@@ -1,0 +1,31 @@
+$kind: collection
+description: |-
+  Coleccion completa de pruebas para FacturaExpress - Sistema de Facturacion Electronica DIAN
+
+  ## Flujo de Autenticacion
+  1. Ejecute "Login - Exito" para iniciar sesion
+  2. El token CSRF se extrae automaticamente de la respuesta
+  3. Todas las peticiones POST usan el token almacenado
+
+  ## Casos de Uso Cubiertos
+  - Autenticacion (login/logout)
+  - Dashboard (KPIs)
+  - CRUD Clientes
+  - CRUD Productos
+  - Facturacion (crear, ver detalle, cambiar estado, eliminar)
+  - Punto de Venta (POS)
+  - Reportes (generar, exportar PDF)
+  - Configuracion de la empresa
+  - Administracion de usuarios
+  - Gestion de errores del sistema
+  - Logs de auditoria
+  - Backup y restauracion
+variables:
+  base_url: http://localhost:8080
+  csrf_token: ""
+  username: admin
+  password: admin123
+  cliente_id: ""
+  producto_id: ""
+  factura_id: ""
+  usuario_id: ""

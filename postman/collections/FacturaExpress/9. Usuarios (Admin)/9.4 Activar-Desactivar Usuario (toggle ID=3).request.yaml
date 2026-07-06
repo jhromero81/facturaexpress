@@ -1,0 +1,23 @@
+$kind: http-request
+name: 9.4 Activar/Desactivar Usuario (toggle ID=3)
+url: "{{base_url}}/usuarios?action=toggleActivo"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+queryParams:
+  action: toggleActivo
+body:
+  type: urlencoded
+  content:
+    action: toggleActivo
+    _csrf_token: "{{csrf_token}}"
+    id: "3"
+    activo: "false"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Estado cambiado exitosamente', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+    language: text/javascript
+order: 4000

@@ -1,0 +1,3 @@
+$kind: collection
+description: Gestion de backups de la base de datos
+order: 12000

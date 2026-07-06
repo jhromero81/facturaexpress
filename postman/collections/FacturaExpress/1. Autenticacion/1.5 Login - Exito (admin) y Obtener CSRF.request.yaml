@@ -1,0 +1,33 @@
+$kind: http-request
+url: "{{base_url}}/login"
+method: POST
+headers:
+  Content-Type: application/x-www-form-urlencoded
+body:
+  type: urlencoded
+  content:
+    username: admin
+    password: admin123
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Login exitoso - redirige al dashboard', function () {
+          pm.expect(pm.response.code).to.be.oneOf([200, 302, 303]);
+      });
+
+      // Obtener CSRF token desde /configuracion
+      pm.sendRequest({
+          url: pm.variables.get('base_url') + '/configuracion',
+          method: 'GET'
+      }, function (err, res) {
+          if (!err) {
+              var html = res.text();
+              var match = html.match(/name="_csrf_token"\s+value="([^"]+)"/);
+              if (match && match[1]) {
+                  pm.collectionVariables.set('csrf_token', match[1]);
+                  console.log('CSRF token: ' + match[1]);
+              }
+          }
+      });
+    language: text/javascript
+order: 5000

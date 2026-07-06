@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-// Servlet que maneja la creacion, descarga, restauracion y eliminacion de respaldos de base de datos
+// Servlet que maneja la creación, descarga, restauración y eliminación de respaldos de base de datos
 public class BackupRestoreServlet extends HttpServlet {
 
     // Directorio donde se almacenan los archivos de respaldo
