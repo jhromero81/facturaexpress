@@ -34,7 +34,7 @@ public class Cliente {
         this.fechaCreacion = fechaCreacion;
     }
 
-    // Asigna la fecha de creacion antes de persistir
+    // Asigna la fecha de creación antes de persistir
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();

@@ -3,7 +3,8 @@ package com.codewise.facturaexpress.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-// Entidad que registra la bitacora de auditoria del sistema
+// Entidad que registra la bitácora de auditoria del sistema.
+// Relación: @ManyToOne Usuario. El campo transient usuarioNombre se rellena via @PostLoad.
 @Entity
 @Table(name = "logs_auditoria")
 public class LogAuditoria {
@@ -12,8 +13,9 @@ public class LogAuditoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "usuario_id", nullable = false)
-    private Long usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     @Transient
     private String usuarioNombre;
@@ -33,16 +35,20 @@ public class LogAuditoria {
     @Column(nullable = false, updatable = false)
     private LocalDateTime fecha;
 
-    // Asigna la fecha actual antes de persistir
     @PrePersist
     protected void onCreate() {
         this.fecha = LocalDateTime.now();
     }
 
+    @PostLoad
+    private void postLoad() {
+        if (usuario != null) this.usuarioNombre = usuario.getNombre();
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public Long getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
     public String getUsuarioNombre() { return usuarioNombre; }
     public void setUsuarioNombre(String usuarioNombre) { this.usuarioNombre = usuarioNombre; }
     public String getAccion() { return accion; }

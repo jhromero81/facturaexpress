@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
-// Servicio para la generacion de XML de facturas electronicas (formato DIAN)
+// Servicio para la generación de XML de facturas electrónicas (formato DIAN)
 @Service
 public class XmlService {
 
@@ -23,7 +23,7 @@ public class XmlService {
         xml.append("  <Cabecera>\n");
         xml.append("    <IdFactura>").append(escape(factura.getId() != null ? factura.getId().toString() : "")).append("</IdFactura>\n");
         xml.append("    <FechaEmision>").append(factura.getFecha() != null ? factura.getFecha().format(FMT) : "").append("</FechaEmision>\n");
-        xml.append("    <ClienteId>").append(escape(factura.getClienteId() != null ? factura.getClienteId().toString() : "")).append("</ClienteId>\n");
+        xml.append("    <ClienteId>").append(escape(factura.getCliente() != null ? factura.getCliente().getId().toString() : "")).append("</ClienteId>\n");
         xml.append("    <ClienteNombre>").append(escape(factura.getClienteNombre())).append("</ClienteNombre>\n");
         xml.append("    <Total>").append(factura.getTotal() != null ? factura.getTotal().toPlainString() : "0.00").append("</Total>\n");
         xml.append("    <Estado>").append(escape(factura.getEstado())).append("</Estado>\n");
@@ -35,7 +35,7 @@ public class XmlService {
             for (DetalleFactura d : factura.getDetalles()) {
                 xml.append("    <Detalle>\n");
                 xml.append("      <NumeroLinea>").append(idx++).append("</NumeroLinea>\n");
-                xml.append("      <ProductoId>").append(d.getProductoId() != null ? d.getProductoId().toString() : "").append("</ProductoId>\n");
+                xml.append("      <ProductoId>").append(d.getProducto() != null ? d.getProducto().getId().toString() : "").append("</ProductoId>\n");
                 xml.append("      <Cantidad>").append(d.getCantidad() != null ? d.getCantidad().toString() : "0").append("</Cantidad>\n");
                 xml.append("      <PrecioUnitario>").append(d.getPrecioUnitario() != null ? d.getPrecioUnitario().toPlainString() : "0.00").append("</PrecioUnitario>\n");
                 xml.append("      <Subtotal>").append(d.getSubtotal() != null ? d.getSubtotal().toPlainString() : "0.00").append("</Subtotal>\n");

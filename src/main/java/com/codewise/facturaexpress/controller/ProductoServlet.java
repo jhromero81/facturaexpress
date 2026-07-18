@@ -30,13 +30,8 @@ public class ProductoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         req.setAttribute("activeNav", "productos");
         req.setAttribute("pageTitle", "Productos");
-        req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         String action = req.getParameter("action");
         if (action == null) action = "listar";
 
@@ -59,15 +54,6 @@ public class ProductoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-        if (!AuthUtil.validarCsrfToken(req)) {
-            req.setAttribute("error", "Token CSRF invalido");
-            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
-            return;
-        }
         req.setAttribute("activeNav", "productos");
         req.setAttribute("pageTitle", "Productos");
         String action = req.getParameter("action");
@@ -78,7 +64,7 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
-    // Obtiene la lista de productos y la envia a la vista
+    // Obtiene la lista de productos y la envía a la vista
     private void listarProductos(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -91,7 +77,7 @@ public class ProductoServlet extends HttpServlet {
         }
     }
 
-    // Muestra el formulario de edicion con los datos del producto
+    // Muestra el formulario de edición con los datos del producto
     private void mostrarFormularioEdicion(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -136,11 +122,9 @@ public class ProductoServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/jsp/confirmacion.jsp").forward(req, resp);
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Precio o stock invalido: deben ser numeros");
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al guardar producto: " + e.getMessage());
@@ -173,11 +157,9 @@ public class ProductoServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/productos");
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Precio o stock invalido: deben ser numeros");
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/producto-form.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al actualizar producto: " + e.getMessage());

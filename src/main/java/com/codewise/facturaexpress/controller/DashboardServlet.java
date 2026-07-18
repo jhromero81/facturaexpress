@@ -1,6 +1,5 @@
 package com.codewise.facturaexpress.controller;
 
-import com.codewise.facturaexpress.config.AuthUtil;
 import com.codewise.facturaexpress.service.ReportesService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -9,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-// Servlet que muestra el panel principal con indicadores y resumenes
+// Servlet que muestra el panel principal con indicadores y resúmenes
 public class DashboardServlet extends HttpServlet {
 
     private final ReportesService reportesService;
@@ -22,10 +21,6 @@ public class DashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         try {
             req.setAttribute("facturasDia", reportesService.facturasDelDia());
             req.setAttribute("ventasDia", reportesService.ventasDelDia());
@@ -37,7 +32,6 @@ public class DashboardServlet extends HttpServlet {
             req.setAttribute("ultimasTransacciones", reportesService.ultimasTransacciones(5));
             req.setAttribute("activeNav", "dashboard");
             req.setAttribute("pageTitle", "Dashboard");
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al cargar dashboard: " + e.getMessage());

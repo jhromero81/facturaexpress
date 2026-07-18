@@ -6,21 +6,22 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-// Repositorio JPA para la entidad DetalleFactura
+// Repositorio JPA para la entidad DetalleFactura.
+// Las consultas usan LEFT JOIN FETCH para cargar la relación con Producto en una sola query.
 public interface DetalleFacturaRepository extends JpaRepository<DetalleFactura, Long> {
 
-    // Busca detalles por factura incluyendo el nombre del producto
-    @Query("SELECT d FROM DetalleFactura d LEFT JOIN Producto p ON p.id = d.productoId WHERE d.facturaId = :facturaId ORDER BY d.id")
-    List<DetalleFactura> findByFacturaIdWithProductoNombre(Long facturaId);
+    // Obtiene los detalles de una factura con el producto asociado
+    @Query("SELECT d FROM DetalleFactura d LEFT JOIN FETCH d.producto WHERE d.factura.id = :facturaId ORDER BY d.id")
+    List<DetalleFactura> findByFacturaIdWithProducto(Long facturaId);
 
     // Elimina todos los detalles de una factura
     void deleteByFacturaId(Long facturaId);
 
-    // Obtiene todos los detalles con nombre de producto
-    @Query("SELECT d FROM DetalleFactura d LEFT JOIN Producto p ON p.id = d.productoId ORDER BY d.id")
-    List<DetalleFactura> findAllWithProductoNombre();
+    // Obtiene todos los detalles con el producto asociado
+    @Query("SELECT d FROM DetalleFactura d LEFT JOIN FETCH d.producto ORDER BY d.id")
+    List<DetalleFactura> findAllWithProducto();
 
-    // Busca un detalle por ID con nombre de producto
-    @Query("SELECT d FROM DetalleFactura d LEFT JOIN Producto p ON p.id = d.productoId WHERE d.id = :id")
-    java.util.Optional<DetalleFactura> findByIdWithProductoNombre(Long id);
+    // Busca un detalle por ID con el producto asociado
+    @Query("SELECT d FROM DetalleFactura d LEFT JOIN FETCH d.producto WHERE d.id = :id")
+    java.util.Optional<DetalleFactura> findByIdWithProducto(Long id);
 }

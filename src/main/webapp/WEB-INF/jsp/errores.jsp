@@ -64,7 +64,7 @@
             <td class="table-mono"><%= e.getId() %></td>
             <td><span class="badge-status" style="background:rgba(52,152,219,0.12);color:#3498db;text-transform:uppercase;"><%= e.getTipo() %></span></td>
             <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= e.getMensaje() %></td>
-            <td class="table-mono"><%= e.getFacturaId() != null ? e.getFacturaId() : "-" %></td>
+            <td class="table-mono"><%= e.getFactura() != null ? e.getFactura().getId() : "-" %></td>
             <td style="font-size:12px;"><%= e.getFechaCreacion() != null ? e.getFechaCreacion().toString().replace("T", " ") : "" %></td>
             <td>
               <% if (e.isResuelto()) { %>

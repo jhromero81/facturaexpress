@@ -41,12 +41,7 @@ public class FacturaServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         req.setAttribute("activeNav", "facturas");
-        req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         String action = req.getParameter("action");
         if (action == null) action = "listar";
 
@@ -73,15 +68,6 @@ public class FacturaServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-        if (!AuthUtil.validarCsrfToken(req)) {
-            req.setAttribute("error", "Token CSRF invalido");
-            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
-            return;
-        }
         req.setAttribute("activeNav", "facturas");
         req.setAttribute("pageTitle", "Facturas");
         String action = req.getParameter("action");
@@ -92,7 +78,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
-    // Obtiene el listado de facturas y lo envia a la vista
+    // Obtiene el listado de facturas y lo envía a la vista
     private void listarFacturas(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -124,7 +110,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
-    // Muestra el detalle de una factura especifica
+    // Muestra el detalle de una factura específica
     private void mostrarDetalle(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -152,7 +138,9 @@ public class FacturaServlet extends HttpServlet {
             if (clienteIdStr == null || clienteIdStr.trim().isEmpty()) {
                 throw new IllegalArgumentException("Debe seleccionar un cliente");
             }
-            factura.setClienteId(Long.parseLong(clienteIdStr));
+            Cliente cliente = clienteService.buscarPorId(Long.parseLong(clienteIdStr))
+                    .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con id: " + clienteIdStr));
+            factura.setCliente(cliente);
 
             String[] productosId = req.getParameterValues("productoId");
             String[] cantidades = req.getParameterValues("cantidad");
@@ -165,8 +153,11 @@ public class FacturaServlet extends HttpServlet {
             List<DetalleFactura> detalles = new ArrayList<>();
             for (int i = 0; i < productosId.length; i++) {
                 if (productosId[i] == null || productosId[i].isEmpty()) continue;
+                long pid = Long.parseLong(productosId[i]);
+                Producto producto = productoService.buscarPorId(pid)
+                        .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con id: " + pid));
                 DetalleFactura detalle = new DetalleFactura();
-                detalle.setProductoId(Long.parseLong(productosId[i]));
+                detalle.setProducto(producto);
                 detalle.setCantidad(Integer.parseInt(cantidades[i]));
                 detalle.setPrecioUnitario(new BigDecimal(precios[i]));
                 detalles.add(detalle);
@@ -194,7 +185,7 @@ public class FacturaServlet extends HttpServlet {
         }
     }
 
-    // Cambia el estado de una factura (PENDIENTE, PAGADA, ANULADA, etc)
+    // Cambia el estado de una factura (PENDIENTE, PAGADA, ANULADA, etc.)
     private void cambiarEstado(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
         try {
@@ -236,7 +227,6 @@ public class FacturaServlet extends HttpServlet {
         try {
             req.setAttribute("clientes", clienteService.listarClientes());
             req.setAttribute("productos", productoService.listarProductos());
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         } catch (Exception e) {
             System.err.println("Error al cargar datos del formulario: " + e.getMessage());
         }

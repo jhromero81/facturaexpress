@@ -29,13 +29,8 @@ public class ClienteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         req.setAttribute("activeNav", "clientes");
         req.setAttribute("pageTitle", "Clientes");
-        req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         String action = req.getParameter("action");
         if (action == null) action = "listar";
 
@@ -58,15 +53,6 @@ public class ClienteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-        if (!AuthUtil.validarCsrfToken(req)) {
-            req.setAttribute("error", "Token CSRF invalido");
-            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
-            return;
-        }
         req.setAttribute("activeNav", "clientes");
         req.setAttribute("pageTitle", "Clientes");
         String action = req.getParameter("action");
@@ -77,7 +63,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    // Obtiene la lista de clientes y la envia a la vista
+    // Obtiene la lista de clientes y la envía a la vista
     private void listarClientes(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -90,7 +76,7 @@ public class ClienteServlet extends HttpServlet {
         }
     }
 
-    // Muestra el formulario de edicion con los datos del cliente
+    // Muestra el formulario de edición con los datos del cliente
     private void mostrarFormularioEdicion(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
@@ -127,7 +113,6 @@ public class ClienteServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/jsp/confirmacion.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/cliente-form.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al guardar cliente: " + e.getMessage());
@@ -153,7 +138,6 @@ public class ClienteServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/clientes");
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.setAttribute("cliente", construirClienteDesdeRequest(req));
             req.getRequestDispatcher("/WEB-INF/jsp/cliente-form.jsp").forward(req, resp);
         } catch (Exception e) {

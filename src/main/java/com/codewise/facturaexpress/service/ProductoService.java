@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-// Servicio que implementa la logica de negocio para la entidad Producto
+// Servicio que implementa la lógica de negocio para la entidad Producto
 @Service
 public class ProductoService {
 

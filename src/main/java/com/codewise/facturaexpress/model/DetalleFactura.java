@@ -3,7 +3,9 @@ package com.codewise.facturaexpress.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-// Entidad que representa el detalle de una factura (linea de producto)
+// Entidad que representa el detalle (línea de producto) de una factura.
+// Relaciones: @ManyToOne Factura, @ManyToOne Producto.
+// El campo transient (productoNombre) se rellena via @PostLoad.
 @Entity
 @Table(name = "detalles_factura")
 public class DetalleFactura {
@@ -12,11 +14,13 @@ public class DetalleFactura {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "factura_id", nullable = false)
-    private Long facturaId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "factura_id", nullable = false)
+    private Factura factura;
 
-    @Column(name = "producto_id", nullable = false)
-    private Long productoId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "producto_id", nullable = false)
+    private Producto producto;
 
     @Transient
     private String productoNombre;
@@ -37,12 +41,17 @@ public class DetalleFactura {
         this.descuento = BigDecimal.ZERO;
     }
 
+    @PostLoad
+    private void postLoad() {
+        if (producto != null) this.productoNombre = producto.getNombre();
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public Long getFacturaId() { return facturaId; }
-    public void setFacturaId(Long facturaId) { this.facturaId = facturaId; }
-    public Long getProductoId() { return productoId; }
-    public void setProductoId(Long productoId) { this.productoId = productoId; }
+    public Factura getFactura() { return factura; }
+    public void setFactura(Factura factura) { this.factura = factura; }
+    public Producto getProducto() { return producto; }
+    public void setProducto(Producto producto) { this.producto = producto; }
     public String getProductoNombre() { return productoNombre; }
     public void setProductoNombre(String productoNombre) { this.productoNombre = productoNombre; }
     public Integer getCantidad() { return cantidad; }
@@ -56,6 +65,6 @@ public class DetalleFactura {
 
     @Override
     public String toString() {
-        return "DetalleFactura{" + "id=" + id + ", productoId=" + productoId + ", cantidad=" + cantidad + ", subtotal=" + subtotal + '}';
+        return "DetalleFactura{" + "id=" + id + ", producto=" + (producto != null ? producto.getNombre() : "null") + ", cantidad=" + cantidad + ", subtotal=" + subtotal + '}';
     }
 }

@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-// Entidad que representa una factura electronica
+// Entidad que representa una factura electronica.
+// Relaciones: @ManyToOne Cliente, @ManyToOne Usuario, @OneToMany DetalleFactura.
+// Los campos transient (clienteNombre) se rellenan via @PostLoad para compatibilidad con JSPs.
 @Entity
 @Table(name = "facturas")
 public class Factura {
@@ -15,14 +17,16 @@ public class Factura {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "cliente_id", nullable = false)
-    private Long clienteId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private Cliente cliente;
 
     @Transient
     private String clienteNombre;
 
-    @Column(name = "usuario_id")
-    private Long usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     @Column(nullable = false)
     private LocalDateTime fecha;
@@ -50,11 +54,10 @@ public class Factura {
     @Column(name = "correo_enviado", nullable = false)
     private boolean correoEnviado;
 
-    @Transient
-    private List<DetalleFactura> detalles;
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleFactura> detalles = new ArrayList<>();
 
     public Factura() {
-        this.detalles = new ArrayList<>();
         this.fecha = LocalDateTime.now();
         this.estado = "PENDIENTE";
         this.firmaEstado = "pendiente";
@@ -63,14 +66,19 @@ public class Factura {
         this.total = BigDecimal.ZERO;
     }
 
+    @PostLoad
+    private void postLoad() {
+        if (cliente != null) this.clienteNombre = cliente.getNombre();
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public Long getClienteId() { return clienteId; }
-    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
+    public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
     public String getClienteNombre() { return clienteNombre; }
     public void setClienteNombre(String clienteNombre) { this.clienteNombre = clienteNombre; }
-    public Long getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
     public LocalDateTime getFecha() { return fecha; }
     public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
     public BigDecimal getTotal() { return total; }
@@ -92,8 +100,18 @@ public class Factura {
     public List<DetalleFactura> getDetalles() { return detalles; }
     public void setDetalles(List<DetalleFactura> detalles) { this.detalles = detalles; }
 
+    public void addDetalle(DetalleFactura detalle) {
+        detalles.add(detalle);
+        detalle.setFactura(this);
+    }
+
+    public void removeDetalle(DetalleFactura detalle) {
+        detalles.remove(detalle);
+        detalle.setFactura(null);
+    }
+
     @Override
     public String toString() {
-        return "Factura{" + "id=" + id + ", clienteId=" + clienteId + ", total=" + total + ", estado='" + estado + '\'' + '}';
+        return "Factura{" + "id=" + id + ", cliente=" + (cliente != null ? cliente.getNombre() : "null") + ", total=" + total + ", estado='" + estado + '\'' + '}';
     }
 }

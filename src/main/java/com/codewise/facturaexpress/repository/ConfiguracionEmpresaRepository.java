@@ -8,6 +8,6 @@ import java.util.Optional;
 // Repositorio JPA para la entidad ConfiguracionEmpresa
 public interface ConfiguracionEmpresaRepository extends JpaRepository<ConfiguracionEmpresa, Long> {
 
-    // Obtiene el primer registro de configuracion (solo debe existir uno)
+    // Obtiene el primer registro de configuración (solo debe existir uno)
     Optional<ConfiguracionEmpresa> findFirstByOrderByIdAsc();
 }

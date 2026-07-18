@@ -22,7 +22,7 @@ public class ReportesRepository {
         return result != null ? result.intValue() : 0;
     }
 
-    // Suma el total de ventas del dia actual
+    // Suma el total de ventas del día actual
     public BigDecimal ventasDelDia() {
         BigDecimal result = (BigDecimal) em.createNativeQuery(
                 "SELECT COALESCE(SUM(total), 0) FROM facturas WHERE DATE(fecha) = CURDATE()")
@@ -30,7 +30,7 @@ public class ReportesRepository {
         return result != null ? result : BigDecimal.ZERO;
     }
 
-    // Calcula el ticket promedio del dia actual
+    // Calcula el ticket promedio del día actual
     public BigDecimal ticketPromedio() {
         BigDecimal result = (BigDecimal) em.createNativeQuery(
                 "SELECT COALESCE(AVG(total), 0) FROM facturas WHERE DATE(fecha) = CURDATE()")
@@ -54,7 +54,7 @@ public class ReportesRepository {
         return result != null ? result : BigDecimal.ZERO;
     }
 
-    // Obtiene las ventas diarias de los ultimos 7 dias
+    // Obtiene las ventas diarias de los últimos 7 días
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ventasSemana() {
         List<Object[]> rows = em.createNativeQuery(
@@ -72,7 +72,7 @@ public class ReportesRepository {
         return result;
     }
 
-    // Obtiene las ventas mensuales de los ultimos 6 meses
+    // Obtiene las ventas mensuales de los últimos 6 meses
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ventasMensuales() {
         List<Object[]> rows = em.createNativeQuery(
@@ -90,7 +90,7 @@ public class ReportesRepository {
         return result;
     }
 
-    // Obtiene los N productos mas vendidos
+    // Obtiene los N productos más vendidos
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> topProductos(int limite) {
         List<Object[]> rows = em.createNativeQuery(
@@ -109,7 +109,7 @@ public class ReportesRepository {
         return result;
     }
 
-    // Obtiene las ventas trimestrales del ultimo ano
+    // Obtiene las ventas trimestrales del último año
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ventasTrimestrales() {
         List<Object[]> rows = em.createNativeQuery(
@@ -127,7 +127,7 @@ public class ReportesRepository {
         return result;
     }
 
-    // Obtiene las ventas anuales de los ultimos 5 anos
+    // Obtiene las ventas anuales de los últimos 5 años
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ventasAnuales() {
         List<Object[]> rows = em.createNativeQuery(
@@ -145,7 +145,7 @@ public class ReportesRepository {
         return result;
     }
 
-    // Obtiene las ultimas N transacciones con datos del cliente
+    // Obtiene las últimas N transacciones con datos del cliente
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> ultimasTransacciones(int limite) {
         List<Object[]> rows = em.createNativeQuery(

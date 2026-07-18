@@ -5,7 +5,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-// Servicio para el envio de correos electronicos con adjuntos PDF
+// Servicio para el envío de correos electrónicos con adjuntos PDF
 @Service
 public class EmailService {
 

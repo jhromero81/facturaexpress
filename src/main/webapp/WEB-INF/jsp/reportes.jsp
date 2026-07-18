@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div>
       <form method="post" action="${pageContext.request.contextPath}/reportes" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <input type="hidden" name="action" value="generar"/>
-        <input type="hidden" name="csrfToken" value="${csrfToken}"/>
+        <input type="hidden" name="_csrf_token" value="${csrfToken}"/>
         <select name="tipo" required style="height:36px;font-size:13px;padding:0 8px;border:1px solid #cfd8dc;border-radius:6px;background:#fff;">
           <option value="ventas_diarias">Ventas Diarias</option>
           <option value="impuestos">Impuestos</option>

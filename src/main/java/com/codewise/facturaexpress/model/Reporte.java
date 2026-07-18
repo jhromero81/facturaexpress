@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-// Entidad que representa un reporte generado
+// Entidad que representa un reporte generado.
+// Relación: @ManyToOne Usuario. El campo transient usuarioNombre se rellena via @PostLoad.
 @Entity
 @Table(name = "reportes")
 public class Reporte {
@@ -24,8 +25,9 @@ public class Reporte {
 
     private String archivo;
 
-    @Column(name = "usuario_id")
-    private Long usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     @Transient
     private String usuarioNombre;
@@ -35,10 +37,14 @@ public class Reporte {
 
     public Reporte() {}
 
-    // Asigna la fecha de creacion antes de persistir
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();
+    }
+
+    @PostLoad
+    private void postLoad() {
+        if (usuario != null) this.usuarioNombre = usuario.getNombre();
     }
 
     public Long getId() { return id; }
@@ -51,8 +57,8 @@ public class Reporte {
     public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
     public String getArchivo() { return archivo; }
     public void setArchivo(String archivo) { this.archivo = archivo; }
-    public Long getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
     public String getUsuarioNombre() { return usuarioNombre; }
     public void setUsuarioNombre(String usuarioNombre) { this.usuarioNombre = usuarioNombre; }
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }

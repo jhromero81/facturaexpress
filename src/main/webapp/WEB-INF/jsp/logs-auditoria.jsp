@@ -31,7 +31,7 @@
         <% for (LogAuditoria l : logs) { %>
           <tr>
             <td class="table-mono"><%= l.getId() %></td>
-            <td><strong><%= l.getUsuarioNombre() != null ? l.getUsuarioNombre() : "ID:" + l.getUsuarioId() %></strong></td>
+            <td><strong><%= l.getUsuarioNombre() != null ? l.getUsuarioNombre() : "ID:" + (l.getUsuario() != null ? l.getUsuario().getId() : "") %></strong></td>
             <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= l.getAccion() %></td>
             <td><span class="badge-status" style="background:rgba(52,152,219,0.12);color:#3498db;"><%= l.getTablaAfectada() != null ? l.getTablaAfectada() : "-" %></span></td>
             <td class="table-mono"><%= l.getRegistroId() != null ? l.getRegistroId() : "-" %></td>

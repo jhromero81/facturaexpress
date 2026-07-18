@@ -26,13 +26,8 @@ public class ErrorSistemaServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         req.setAttribute("activeNav", "errores");
         req.setAttribute("pageTitle", "Errores del Sistema");
-        req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         String action = req.getParameter("action");
 
         if ("resolver".equals(action)) {

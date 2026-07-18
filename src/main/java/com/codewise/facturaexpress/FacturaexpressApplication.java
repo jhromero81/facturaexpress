@@ -1,22 +1,35 @@
 package com.codewise.facturaexpress;
 
 // Importaciones de controladores y servicios de la aplicación
+import com.codewise.facturaexpress.config.AuthFilter;
 import com.codewise.facturaexpress.controller.*;
 import com.codewise.facturaexpress.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 
 // Clase principal que inicia la aplicación Spring Boot
 @SpringBootApplication
 public class FacturaexpressApplication {
 
-	// Metodo principal punto de entrada de la aplicación
+	// Método principal punto de entrada de la aplicación
 	public static void main(String[] args) {
 		SpringApplication.run(FacturaexpressApplication.class, args);
+	}
+
+	// Bean que registra el filtro de autenticación y CSRF
+	@Bean
+	public FilterRegistrationBean<AuthFilter> authFilter() {
+		FilterRegistrationBean<AuthFilter> bean = new FilterRegistrationBean<>();
+		bean.setFilter(new AuthFilter());
+		bean.addUrlPatterns("/*");
+		bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		return bean;
 	}
 
 	// Bean que registra el servlet de clientes en la ruta /clientes

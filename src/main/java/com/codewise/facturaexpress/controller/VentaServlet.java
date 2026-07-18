@@ -33,16 +33,11 @@ public class VentaServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         try {
             req.setAttribute("clientes", clienteService.listarClientes());
             req.setAttribute("productos", productoService.listarProductos());
             req.setAttribute("activeNav", "ventas");
             req.setAttribute("pageTitle", "Punto de Venta");
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/pos.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al cargar POS: " + e.getMessage());
@@ -54,15 +49,6 @@ public class VentaServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-        if (!AuthUtil.validarCsrfToken(req)) {
-            req.setAttribute("error", "Token CSRF invalido");
-            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
-            return;
-        }
         try {
             String action = req.getParameter("action");
             if ("finalizar".equals(action)) {
@@ -75,7 +61,9 @@ public class VentaServlet extends HttpServlet {
 
                 Factura factura = new Factura();
                 if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
-                    factura.setClienteId(Long.parseLong(clienteIdParam));
+                    Cliente cliente = clienteService.buscarPorId(Long.parseLong(clienteIdParam))
+                            .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con id: " + clienteIdParam));
+                    factura.setCliente(cliente);
                 } else {
                     throw new IllegalArgumentException("Debe seleccionar un cliente");
                 }
@@ -87,8 +75,11 @@ public class VentaServlet extends HttpServlet {
                 List<DetalleFactura> detalles = new ArrayList<>();
                 for (int i = 0; i < productosId.length; i++) {
                     if (productosId[i] == null || productosId[i].isEmpty()) continue;
+                    long pid = Long.parseLong(productosId[i]);
+                    Producto producto = productoService.buscarPorId(pid)
+                            .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con id: " + pid));
                     DetalleFactura detalle = new DetalleFactura();
-                    detalle.setProductoId(Long.parseLong(productosId[i]));
+                    detalle.setProducto(producto);
                     detalle.setCantidad(Integer.parseInt(cantidades[i]));
                     detalle.setPrecioUnitario(new BigDecimal(precios[i]));
                     detalles.add(detalle);
@@ -107,14 +98,12 @@ public class VentaServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/ventas");
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Error en el formato de los numeros ingresados");
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             cargarDatos(req);
             req.setAttribute("activeNav", "ventas");
             req.setAttribute("pageTitle", "Punto de Venta");
             req.getRequestDispatcher("/WEB-INF/jsp/pos.jsp").forward(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             cargarDatos(req);
             req.setAttribute("activeNav", "ventas");
             req.setAttribute("pageTitle", "Punto de Venta");

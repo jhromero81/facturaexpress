@@ -62,7 +62,7 @@
     default:          estadoColor = "#f39c12"; estadoIcono = "schedule";     estadoTexto = "Pendiente";  break;
   }
   String fechaStr = f.getFecha() != null ? f.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yy")) : "-";
-  String clienteStr = f.getClienteNombre() != null ? f.getClienteNombre() : "Cliente #" + f.getClienteId();
+  String clienteStr = f.getClienteNombre() != null ? f.getClienteNombre() : "Cliente #" + (f.getCliente() != null ? f.getCliente().getId() : "");
   BigDecimal totalVal = f.getTotal();
   String totalStr = totalVal != null ? "$ " + String.format("%,.0f", totalVal) : "$ 0";
   String numFac = "FAC-" + String.format("%06d", f.getId());
@@ -72,7 +72,7 @@
         <td><%= fechaStr %></td>
         <td>
           <%= clienteStr %><br>
-          <small style="color:#90a4ae;">ID: <%= f.getClienteId() %></small>
+          <small style="color:#90a4ae;">ID: <%= f.getCliente() != null ? f.getCliente().getId() : "" %></small>
         </td>
         <td>
           <span class="badge-status inline-flex" style="background:<%= estadoColor %>15;color:<%= estadoColor %>;display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">

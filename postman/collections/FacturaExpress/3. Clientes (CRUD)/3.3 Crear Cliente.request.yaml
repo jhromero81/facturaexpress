@@ -28,4 +28,5 @@ scripts:
           }
       });
     language: text/javascript
+examples: .resources/3.3 Crear Cliente.resources/examples
 order: 3000

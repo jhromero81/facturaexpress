@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-// Servlet para la administracion de usuarios del sistema
+// Servlet para la administración de usuarios del sistema
 public class UserAdminServlet extends HttpServlet {
 
     private final UsuarioAdminService usuarioAdminService;
@@ -27,12 +27,7 @@ public class UserAdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         req.setAttribute("activeNav", "usuarios");
-        req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         String action = req.getParameter("action");
         if ("nuevo".equals(action)) {
             req.setAttribute("pageTitle", "Nuevo Usuario");
@@ -60,15 +55,6 @@ public class UserAdminServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-        if (!AuthUtil.validarCsrfToken(req)) {
-            req.setAttribute("error", "Token CSRF invalido");
-            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
-            return;
-        }
         req.setAttribute("activeNav", "usuarios");
         String action = req.getParameter("action");
         try {

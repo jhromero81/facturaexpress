@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-// Entidad que almacena la configuracion de la empresa
+// Entidad que almacena la configuración de la empresa
 @Entity
 @Table(name = "configuracion_empresa")
 public class ConfiguracionEmpresa {
@@ -44,7 +44,7 @@ public class ConfiguracionEmpresa {
 
     private LocalDateTime actualizada;
 
-    // Actualiza la fecha de modificacion antes de persistir o actualizar
+    // Actualiza la fecha de modificación antes de persistir o actualizar
     @PrePersist
     @PreUpdate
     protected void onUpdate() {

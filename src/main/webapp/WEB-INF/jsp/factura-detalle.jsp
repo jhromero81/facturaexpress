@@ -30,7 +30,7 @@
 
     <%-- Resumen: cliente y total --%>
     <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px;padding:16px;background:var(--bg-main);border-radius:8px;">
-      <div class="detail-item"><div class="detail-label">Cliente</div><div class="detail-value"><%= factura.getClienteNombre() != null ? factura.getClienteNombre() : "ID: " + factura.getClienteId() %></div></div>
+      <div class="detail-item"><div class="detail-label">Cliente</div><div class="detail-value"><%= factura.getClienteNombre() != null ? factura.getClienteNombre() : "ID: " + (factura.getCliente() != null ? factura.getCliente().getId() : "-") %></div></div>
       <div class="detail-item"><div class="detail-label">Total</div><div class="detail-value" style="color:var(--accent);">$ <%= String.format("%,.0f", factura.getTotal()) %></div></div>
     </div>
 
@@ -44,7 +44,7 @@
         <% if (factura.getDetalles() != null) { int i = 1; for (DetalleFactura d : factura.getDetalles()) { %>
           <tr>
             <td><%= i++ %></td>
-            <td><strong><%= d.getProductoNombre() != null ? d.getProductoNombre() : "ID: " + d.getProductoId() %></strong></td>
+            <td><strong><%= d.getProductoNombre() != null ? d.getProductoNombre() : "ID: " + (d.getProducto() != null ? d.getProducto().getId() : "-") %></strong></td>
             <td><%= d.getCantidad() %></td>
             <td style="font-family:'Space Mono',monospace;">$ <%= String.format("%,.0f", d.getPrecioUnitario()) %></td>
             <td style="font-family:'Space Mono',monospace;font-weight:700;">$ <%= String.format("%,.0f", d.getSubtotal()) %></td>

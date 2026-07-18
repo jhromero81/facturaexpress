@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-// Servicio para la autenticacion de usuarios mediante username y password
+// Servicio para la autenticación de usuarios mediante username y password
 @Service
 public class LoginService {
 
     private final UsuarioRepository usuarioRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public LoginService(UsuarioRepository usuarioRepository) {
+    public LoginService(UsuarioRepository usuarioRepository, BCryptPasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder();
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Autentica un usuario verificando credenciales y estado activo
@@ -37,8 +37,8 @@ public class LoginService {
         return Optional.empty();
     }
 
-    // Genera el hash BCrypt de una contrasena en texto plano
-    public static String hashPassword(String rawPassword) {
-        return new BCryptPasswordEncoder().encode(rawPassword);
+    // Genera el hash BCrypt de una contraseña en texto plano
+    public String hashPassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 }

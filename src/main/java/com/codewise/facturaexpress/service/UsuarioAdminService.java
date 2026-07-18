@@ -9,16 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-// Servicio para la administracion de usuarios del sistema
+// Servicio para la administración de usuarios del sistema
 @Service
 public class UsuarioAdminService {
 
     private final UsuarioRepository usuarioRepository;
     private final BCryptPasswordEncoder encoder;
 
-    public UsuarioAdminService(UsuarioRepository usuarioRepository) {
+    public UsuarioAdminService(UsuarioRepository usuarioRepository, BCryptPasswordEncoder encoder) {
         this.usuarioRepository = usuarioRepository;
-        this.encoder = new BCryptPasswordEncoder();
+        this.encoder = encoder;
     }
 
     // Obtiene todos los usuarios registrados
@@ -31,7 +31,7 @@ public class UsuarioAdminService {
         return usuarioRepository.findById(id);
     }
 
-    // Crea un nuevo usuario con contrasena encriptada y rol por defecto
+    // Crea un nuevo usuario con contraseña encriptada y rol por defecto
     @Transactional
     public Usuario crearUsuario(Usuario usuario, String passwordPlano) {
         if (usuario.getUsername() == null || usuario.getUsername().isBlank()) {
@@ -63,7 +63,7 @@ public class UsuarioAdminService {
         return usuarioRepository.save(existente);
     }
 
-    // Cambia la contrasena de un usuario
+    // Cambia la contraseña de un usuario
     @Transactional
     public void cambiarPassword(Long id, String nuevaPassword) {
         if (nuevaPassword == null || nuevaPassword.length() < 4) {

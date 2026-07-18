@@ -8,10 +8,10 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-// Servlet para cerrar la sesion del usuario
+// Servlet para cerrar la sesión del usuario
 public class LogoutServlet extends HttpServlet {
 
-    // Invalida la sesion HTTP si existe y redirige al formulario de login
+    // Invalida la sesión HTTP si existe y redirige al formulario de login
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

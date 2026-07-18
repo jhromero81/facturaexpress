@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-// Servicio que implementa la logica de negocio para la entidad Cliente
+// Servicio que implementa la lógica de negocio para la entidad Cliente
 @Service
 public class ClienteService {
 

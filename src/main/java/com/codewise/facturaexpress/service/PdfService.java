@@ -18,13 +18,13 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-// Servicio para la generacion de documentos PDF (facturas y reportes)
+// Servicio para la generación de documentos PDF (facturas y reportes)
 @Service
 public class PdfService {
 
-    // Formato de fecha para los PDFs
+    // Formato de fecha para los PDF
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    // Colores corporativos para el disenio de los PDFs
+    // Colores corporativos para el diseño de los PDF
     private static final Color ACCENT = new Color(26, 188, 156);
     private static final Color DARK = new Color(26, 35, 53);
     private static final Color MUTED = new Color(144, 164, 174);
@@ -69,7 +69,7 @@ public class PdfService {
 
             if (factura.getDetalles() != null) {
                 for (DetalleFactura d : factura.getDetalles()) {
-                    table.addCell(new Phrase(d.getProductoId() != null ? d.getProductoId().toString() : "", normalFont));
+                    table.addCell(new Phrase(d.getProducto() != null ? d.getProducto().getId().toString() : "", normalFont));
                     table.addCell(new Phrase(d.getCantidad() != null ? d.getCantidad().toString() : "0", normalFont));
                     table.addCell(new Phrase("$" + formato(d.getPrecioUnitario()), normalFont));
                     table.addCell(new Phrase("$" + formato(d.getDescuento() != null ? d.getDescuento() : BigDecimal.ZERO), normalFont));
@@ -94,7 +94,7 @@ public class PdfService {
         return baos.toByteArray();
     }
 
-    // Genera un PDF de reporte de ventas con KPIs, grafico y top productos
+    // Genera un PDF de reporte de ventas con KPI, gráfico y top productos
     public byte[] generarPdfReporte(
             String tituloPeriodo,
             byte[] chartImage,

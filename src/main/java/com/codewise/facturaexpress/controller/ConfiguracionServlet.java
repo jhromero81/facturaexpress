@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 
-// Servlet para gestionar la configuracion de la empresa
+// Servlet para gestionar la configuración de la empresa
 public class ConfiguracionServlet extends HttpServlet {
 
     private final ConfiguracionEmpresaService configService;
@@ -24,14 +24,10 @@ public class ConfiguracionServlet extends HttpServlet {
         this.logService = logService;
     }
 
-    // Muestra el formulario de configuracion con los datos actuales
+    // Muestra el formulario de configuración con los datos actuales
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         try {
             ConfiguracionEmpresa config = configService.obtenerConfiguracion();
             if (config != null) {
@@ -39,7 +35,6 @@ public class ConfiguracionServlet extends HttpServlet {
             }
             req.setAttribute("activeNav", "configuracion");
             req.setAttribute("pageTitle", "Configuración");
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/configuracion.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al cargar configuración: " + e.getMessage());
@@ -49,19 +44,10 @@ public class ConfiguracionServlet extends HttpServlet {
         }
     }
 
-    // Guarda o actualiza la configuracion de la empresa
+    // Guarda o actualiza la configuración de la empresa
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-        if (!AuthUtil.validarCsrfToken(req)) {
-            req.setAttribute("error", "Token CSRF invalido");
-            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
-            return;
-        }
         try {
             ConfiguracionEmpresa config = new ConfiguracionEmpresa();
             config.setNit(req.getParameter("nit"));

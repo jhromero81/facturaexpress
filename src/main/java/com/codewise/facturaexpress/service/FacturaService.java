@@ -9,7 +9,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-// Servicio principal para la gestion de facturas: creacion, calculos, documentos y envio
+// Servicio que gestiona el ciclo de vida de las facturas.
+// Se encarga de validaciones, cálculo de totales, descuento de stock,
+// generacion de documentos (XML/PDF), envío de correos y eliminacion logica.
 @Service
 public class FacturaService {
 
@@ -37,17 +39,17 @@ public class FacturaService {
         this.emailService = emailService;
     }
 
-    // Crea una factura sin descuento
+    // Crea una factura sin descuento adicional
     @Transactional
     public Factura crearFactura(Factura factura) {
         return crearFactura(factura, 0);
     }
 
-    // Crea una factura validando cliente, detalles, stock, calculando subtotal, descuento, IVA y total
+    // Crea una factura validando datos, calculando totales con descuento, descontando stock y generando documentos
     @Transactional
     public Factura crearFactura(Factura factura, int descuentoPorcentaje) {
-        if (factura.getClienteId() == null) {
-            throw new IllegalArgumentException("El ID del cliente es obligatorio");
+        if (factura.getCliente() == null) {
+            throw new IllegalArgumentException("El cliente es obligatorio");
         }
         if (factura.getDetalles() == null || factura.getDetalles().isEmpty()) {
             throw new IllegalArgumentException("La factura debe tener al menos un detalle");
@@ -72,11 +74,11 @@ public class FacturaService {
                 detalle.setDescuento(BigDecimal.ZERO);
             }
 
-            Optional<Producto> productoOpt = productoRepository.findById(detalle.getProductoId());
-            if (productoOpt.isEmpty()) {
-                throw new IllegalArgumentException("Producto no encontrado con id: " + detalle.getProductoId());
+            if (detalle.getProducto() == null) {
+                throw new IllegalArgumentException("El producto es obligatorio en cada detalle");
             }
-            Producto producto = productoOpt.get();
+            Producto producto = productoRepository.findById(detalle.getProducto().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con id: " + detalle.getProducto().getId()));
             if (producto.getStock() < detalle.getCantidad()) {
                 throw new IllegalArgumentException("Stock insuficiente para " + producto.getNombre()
                     + " (disponible: " + producto.getStock() + ", solicitado: " + detalle.getCantidad() + ")");
@@ -91,12 +93,14 @@ public class FacturaService {
         factura.setTotal(total);
         factura.setEstado("PENDIENTE");
 
+        for (DetalleFactura detalle : factura.getDetalles()) {
+            factura.addDetalle(detalle);
+        }
+
         Factura creada = facturaRepository.save(factura);
 
-        for (DetalleFactura detalle : factura.getDetalles()) {
-            detalle.setFacturaId(creada.getId());
-            detalleFacturaRepository.save(detalle);
-            productoRepository.descontarStock(detalle.getProductoId(), detalle.getCantidad());
+        for (DetalleFactura detalle : creada.getDetalles()) {
+            productoRepository.descontarStock(detalle.getProducto().getId(), detalle.getCantidad());
         }
 
         generarDocumentos(creada);
@@ -104,7 +108,7 @@ public class FacturaService {
         return buscarPorId(creada.getId()).orElse(creada);
     }
 
-    // Genera los documentos XML y PDF de la factura y envia por correo al cliente
+    // Genera XML, PDF y envia correo electronico al cliente
     public void generarDocumentos(Factura factura) {
         try {
             String xml = xmlService.generarXmlFactura(factura);
@@ -123,21 +127,18 @@ public class FacturaService {
         facturaRepository.save(factura);
 
         try {
-            Optional<Cliente> clienteOpt = clienteRepository.findById(factura.getClienteId());
-            if (clienteOpt.isPresent()) {
-                Cliente cliente = clienteOpt.get();
-                if (cliente.getEmail() != null && !cliente.getEmail().isBlank()) {
-                    boolean enviado = emailService.enviarFactura(
-                        cliente.getEmail(),
-                        "Factura Electronica FAC-" + String.format("%05d", factura.getId()),
-                        "<h2>Factura Electronica</h2><p>Adjunto encontrara su factura No. FAC-" + String.format("%05d", factura.getId()) + ".</p>",
-                        factura.getPdf(),
-                        "factura_" + factura.getId() + ".pdf"
-                    );
-                    if (enviado) {
-                        factura.setCorreoEnviado(true);
-                        facturaRepository.save(factura);
-                    }
+            Cliente cliente = factura.getCliente();
+            if (cliente != null && cliente.getEmail() != null && !cliente.getEmail().isBlank()) {
+                boolean enviado = emailService.enviarFactura(
+                    cliente.getEmail(),
+                    "Factura Electronica FAC-" + String.format("%05d", factura.getId()),
+                    "<h2>Factura Electronica</h2><p>Adjunto encontrara su factura No. FAC-" + String.format("%05d", factura.getId()) + ".</p>",
+                    factura.getPdf(),
+                    "factura_" + factura.getId() + ".pdf"
+                );
+                if (enviado) {
+                    factura.setCorreoEnviado(true);
+                    facturaRepository.save(factura);
                 }
             }
         } catch (Exception e) {
@@ -145,34 +146,30 @@ public class FacturaService {
         }
     }
 
-    // Busca una factura por ID incluyendo nombre del cliente y detalles
+    // Busca una factura por ID incluyendo cliente y detalles con productos
     public Optional<Factura> buscarPorId(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de factura invalido");
         }
-        Optional<Factura> facturaOpt = facturaRepository.findByIdWithClienteNombre(id);
+        Optional<Factura> facturaOpt = facturaRepository.findByIdWithCliente(id);
         facturaOpt.ifPresent(f -> {
-            clienteRepository.findById(f.getClienteId())
-                .ifPresent(c -> f.setClienteNombre(c.getNombre()));
-            List<DetalleFactura> detalles = detalleFacturaRepository.findByFacturaIdWithProductoNombre(f.getId());
+            List<DetalleFactura> detalles = detalleFacturaRepository.findByFacturaIdWithProducto(f.getId());
             f.setDetalles(detalles);
         });
         return facturaOpt;
     }
 
-    // Obtiene todas las facturas con nombre de cliente y detalles
+    // Lista todas las facturas incluyendo cliente y detalles
     public List<Factura> listarFacturas() {
-        List<Factura> facturas = facturaRepository.findAllWithClienteNombre();
+        List<Factura> facturas = facturaRepository.findAllWithCliente();
         for (Factura f : facturas) {
-            clienteRepository.findById(f.getClienteId())
-                .ifPresent(c -> f.setClienteNombre(c.getNombre()));
-            List<DetalleFactura> detalles = detalleFacturaRepository.findByFacturaIdWithProductoNombre(f.getId());
+            List<DetalleFactura> detalles = detalleFacturaRepository.findByFacturaIdWithProducto(f.getId());
             f.setDetalles(detalles);
         }
         return facturas;
     }
 
-    // Actualiza el estado de una factura
+    // Actualiza el estado de una factura existente
     @Transactional
     public void actualizarEstado(Long id, String nuevoEstado) {
         if (id == null || id <= 0) {
@@ -187,13 +184,15 @@ public class FacturaService {
         facturaRepository.save(factura);
     }
 
-    // Elimina una factura y sus detalles asociados
+    // Elimina una factura limpiando sus detalles primero (orphanRemoval)
     @Transactional
     public void eliminarFactura(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID de factura invalido");
         }
-        detalleFacturaRepository.deleteByFacturaId(id);
+        Factura factura = facturaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Factura no encontrada con id: " + id));
+        factura.getDetalles().clear();
         facturaRepository.deleteById(id);
     }
 }

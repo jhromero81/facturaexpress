@@ -3,7 +3,8 @@ package com.codewise.facturaexpress.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-// Entidad que representa un error registrado en el sistema
+// Entidad que representa un error registrado en el sistema.
+// Relación: @ManyToOne Factura (opcional).
 @Entity
 @Table(name = "errores_sistema")
 public class ErrorSistema {
@@ -18,8 +19,9 @@ public class ErrorSistema {
     @Column(nullable = false)
     private String tipo;
 
-    @Column(name = "factura_id")
-    private Long facturaId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "factura_id")
+    private Factura factura;
 
     @Column(nullable = false)
     private boolean resuelto;
@@ -32,7 +34,6 @@ public class ErrorSistema {
 
     public ErrorSistema() {}
 
-    // Inicializa la fecha de creacion y estado resuelto antes de persistir
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();
@@ -45,8 +46,8 @@ public class ErrorSistema {
     public void setMensaje(String mensaje) { this.mensaje = mensaje; }
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
-    public Long getFacturaId() { return facturaId; }
-    public void setFacturaId(Long facturaId) { this.facturaId = facturaId; }
+    public Factura getFactura() { return factura; }
+    public void setFactura(Factura factura) { this.factura = factura; }
     public boolean isResuelto() { return resuelto; }
     public void setResuelto(boolean resuelto) { this.resuelto = resuelto; }
     public LocalDateTime getFechaResolucion() { return fechaResolucion; }

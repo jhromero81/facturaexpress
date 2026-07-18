@@ -30,14 +30,10 @@ public class ReportesServlet extends HttpServlet {
         this.pdfService = pdfService;
     }
 
-    // Carga los datos de reportes y los envia a la vista
+    // Carga los datos de reportes y los envía a la vista
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         try {
             req.setAttribute("ventasMensuales", reportesService.ventasMensuales());
             req.setAttribute("ventasTrimestrales", reportesService.ventasTrimestrales());
@@ -52,7 +48,6 @@ public class ReportesServlet extends HttpServlet {
             req.setAttribute("reportesGuardados", reporteService.listarReportes());
             req.setAttribute("activeNav", "reportes");
             req.setAttribute("pageTitle", "Reportes");
-            req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
             req.getRequestDispatcher("/WEB-INF/jsp/reportes.jsp").forward(req, resp);
         } catch (Exception e) {
             req.setAttribute("error", "Error al cargar reportes: " + e.getMessage());
@@ -66,17 +61,7 @@ public class ReportesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         String action = req.getParameter("action");
-        boolean noCsrf = "exportarPdf".equals(action);
-        if (!noCsrf && !AuthUtil.validarCsrfToken(req)) {
-            req.setAttribute("error", "Token CSRF invalido");
-            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, resp);
-            return;
-        }
         if ("generar".equals(action)) {
             try {
                 String tipo = req.getParameter("tipo");

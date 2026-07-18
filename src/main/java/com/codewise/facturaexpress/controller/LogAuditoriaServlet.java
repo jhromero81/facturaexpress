@@ -1,6 +1,5 @@
 package com.codewise.facturaexpress.controller;
 
-import com.codewise.facturaexpress.config.AuthUtil;
 import com.codewise.facturaexpress.service.LogAuditoriaService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -18,17 +17,12 @@ public class LogAuditoriaServlet extends HttpServlet {
         this.logService = logService;
     }
 
-    // Lista los logs con opcion de filtrar por tabla o por usuario
+    // Lista los logs con opción de filtrar por tabla o por usuario
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        if (AuthUtil.getUsuario(req) == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
         req.setAttribute("activeNav", "logs");
         req.setAttribute("pageTitle", "Auditoría");
-        req.setAttribute("csrfToken", AuthUtil.getCsrfToken(req.getSession()));
         try {
             String tabla = req.getParameter("tabla");
             String usuarioId = req.getParameter("usuarioId");
