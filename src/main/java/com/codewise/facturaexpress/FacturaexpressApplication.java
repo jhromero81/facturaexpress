@@ -149,9 +149,11 @@ public class FacturaexpressApplication {
 
 	// Bean que registra el servlet de respaldo y restauración en la ruta /backup
 	@Bean
-	public ServletRegistrationBean<BackupRestoreServlet> backupRestoreServlet() {
+	public ServletRegistrationBean<BackupRestoreServlet> backupRestoreServlet(javax.sql.DataSource dataSource) {
+		BackupRestoreServlet servlet = new BackupRestoreServlet();
+		servlet.setDataSource(dataSource);
 		ServletRegistrationBean<BackupRestoreServlet> bean =
-				new ServletRegistrationBean<>(new BackupRestoreServlet(), "/backup");
+				new ServletRegistrationBean<>(servlet, "/backup");
 		bean.setLoadOnStartup(1);
 		return bean;
 	}

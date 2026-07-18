@@ -19,19 +19,18 @@ public class BackupRestoreServlet extends HttpServlet {
     private static final String BACKUP_DIR = System.getProperty("java.io.tmpdir") + "/facturaexpress_backups";
     private DataSource dataSource;
 
-    // Inicializa el directorio de respaldos y la conexion JNDI
+    // Permite inyectar el DataSource desde el bean de Spring
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    // Inicializa el directorio de respaldos
     @Override
     public void init() throws ServletException {
         new File(BACKUP_DIR).mkdirs();
-        try {
-            javax.naming.Context ctx = new javax.naming.InitialContext();
-            dataSource = (DataSource) ctx.lookup("java:comp/env/jdbc/facturaexpress");
-        } catch (Exception e) {
-            // fallback: will try to get from Spring context
-        }
     }
 
-    // Obtiene el DataSource, intentando JNDI primero y luego Spring
+    // Obtiene el DataSource inyectado
     private DataSource getDataSource() {
         if (dataSource != null) return dataSource;
         try {
