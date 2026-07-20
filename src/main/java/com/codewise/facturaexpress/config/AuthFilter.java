@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-// Filtro centralizado de autenticacion y CSRF. Reemplaza las validaciones
-// duplicadas que antes existian en cada servlet individualmente.
+// Filtro centralizado de autenticación y CSRF. Reemplaza las validaciones
+// duplicadas que antes existían en cada servlet individualmente.
 public class AuthFilter implements Filter {
 
     @Override

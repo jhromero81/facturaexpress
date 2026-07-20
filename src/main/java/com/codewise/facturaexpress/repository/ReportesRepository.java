@@ -1,7 +1,6 @@
 package com.codewise.facturaexpress.repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -11,10 +10,13 @@ import java.util.*;
 @Repository
 public class ReportesRepository {
 
-    @PersistenceContext
-    private EntityManager em;
+    private final EntityManager em;
 
-    // Cuenta las facturas del dia actual
+    public ReportesRepository(EntityManager em) {
+        this.em = em;
+    }
+
+    // Cuenta las facturas del día actual
     public int facturasDelDia() {
         Number result = (Number) em.createNativeQuery(
                 "SELECT COUNT(*) FROM facturas WHERE DATE(fecha) = CURDATE()")

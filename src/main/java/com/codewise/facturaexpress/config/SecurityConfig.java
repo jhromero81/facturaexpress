@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-// Bean compartido de codificacion de passwords BCrypt
+// Bean compartido de codificación de passwords BCrypt
 @Configuration
 public class SecurityConfig {
 
